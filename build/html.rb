@@ -88,7 +88,7 @@ class Hike
   end
 
   def tags
-    short_long_tags.map { |tag| tag[:long] }
+    short_long_tags.map { |tag| tag[:full] }
   end
 
   def short_tags
@@ -96,7 +96,7 @@ class Hike
   end
 
   def stats
-    (@stats || "").split(/,\s*/).map { |stat| stat.downcase }
+    (@stats.split(/,\s*/) || []).map { |stat| stat.downcase }
   end
 
   def save
