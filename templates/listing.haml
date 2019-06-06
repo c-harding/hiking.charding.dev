@@ -69,6 +69,7 @@
             display: inline
             &:not(:first-child)::before
               content: '• '
+              color: black
           
         @media only screen and (max-width: 700px)
           flex-direction: column
@@ -79,6 +80,11 @@
           
           header
             padding-top: 0
+      
+      .available
+        color: green
+      .full
+        color: red
   %body
     %main
       %heading
@@ -94,8 +100,10 @@
             %ul
               %li= hike.date_string
               %li= hike.time_string
+              - if hike.grade
+                %li= hike.grade
               - if hike.available > 0
-                %li #{hike.available}/#{hike.capacity} spaces available
+                %li.available #{hike.available}/#{hike.capacity} spaces available
               - else
-                %li #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
+                %li.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
             %p= hike.desc
