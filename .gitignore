@@ -1,10 +1,10 @@
 Gemfile.lock
-_site/
+_site
 .sass-cache/
 vendor/
+.bundle/
 Gemfile
 build/
-.bundle/
 hikes.yml
 templates/
 .travis.yml
