@@ -132,8 +132,8 @@ class Hike
 
   def self.save_indices(hikes)
     template = Template.new('templates/listing.haml')
-    save_index(template, 'index.html', hikes.filter(&:upcoming?).sort_by(&:date))
-    save_index(template, 'past.html', hikes.filter(&:past?).sort_by(&:date).reverse)
+    save_index(template, 'index.html', hikes.select(&:upcoming?).sort_by(&:date))
+    save_index(template, 'past.html', hikes.select(&:past?).sort_by(&:date).reverse)
   end
 
   private
