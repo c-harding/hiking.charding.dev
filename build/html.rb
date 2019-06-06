@@ -31,8 +31,8 @@ class Hike
     fetch_participants
   end
 
-  attr_reader :id, :desc, :tags, :full_title, :title, :date, :link, :grade
-  attr_reader :capacity, :registered, :waiting, :image
+  attr_reader :id, :desc, :full_title, :title, :date, :link
+  attr_reader :capacity, :registered, :waiting, :image, :grade
 
   def url
     hb "/routes/events/#{@id}/"
@@ -50,8 +50,16 @@ class Hike
     date.strftime('%-d %b')
   end
 
+  def day_date_string
+    date.strftime('%a %-d %b')
+  end
+
   def time_string
     date.strftime('%H:%M')
+  end
+
+  def day_date_time_string
+    date.strftime('%a %-d %b, %H:%M')
   end
 
   def available
@@ -66,6 +74,21 @@ class Hike
   def image_width
     fetch_image_info unless instance_variable_defined? :@image_width
     @image_width
+  end
+
+  def tags
+    @tags.flat_map { |tag| tag.split(/,\s*/) }.map do |tag|
+      case tag.downcase
+      when 'cycle', 'cycling', 'bike', 'biking'
+        '🚲 Cycling'
+      else
+        tags.titleize
+      end
+    end
+  end
+
+  def stats
+    (@stats || "").split(/,\s*/).map { |stat| stat.downcase }
   end
 
   def save
@@ -120,6 +143,12 @@ class Hike
     while (match = working_title.match(/^\[(.+?)\]\s*(.+)$/))
       tags << match[1]
       working_title = match[2]
+    end
+    if (match = working_title.match(/^(.+)\s*\[(.+?)\]$/))
+      working_title = match[1]
+      @stats = match[2]
+    else
+      @stats = nil
     end
     @title = working_title
     @tags = tags
