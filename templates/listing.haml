@@ -88,9 +88,9 @@
             width: unset
             height: 30vw
       
-      .available
+      .capacity.available
         color: green
-      .full
+      .capacity.full
         color: red
   %body
     %main
@@ -112,12 +112,14 @@
                 %li= stat
               - if hike.grade
                 %li= hike.grade
-            %ul
+            %ul{data: {id: hike.id}}
               %li= hike.day_date_time_string
               - if hike.past?
                 %li #{hike.registered} registered
               - elsif hike.available > 0
-                %li.available #{hike.registered}/#{hike.capacity} registered, #{hike.available} spaces available
+                %li.capacity.available
+                  #{hike.registered}/#{hike.capacity} registered,
+                  #{hike.available} #{'space'.pluralize(hike.available)} available
               - else
-                %li.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
+                %li.capacity.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
             %p= hike.desc
