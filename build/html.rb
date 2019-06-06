@@ -31,7 +31,7 @@ class Hike
     fetch_participants
   end
 
-  attr_reader :id, :desc, :tags, :image, :title, :date, :link
+  attr_reader :id, :desc, :tags, :image, :full_title, :title, :date, :link
   attr_reader :capacity, :registered, :waiting
 
   def url
@@ -43,7 +43,7 @@ class Hike
   end
 
   def page_title
-    "#{date_string}: #{title} - Hiking Buddies Munich"
+    "#{date_string}: #{full_title} - Hiking Buddies Munich"
   end
 
   def date_string
@@ -86,7 +86,8 @@ class Hike
   def fetch_info
     doc = Nokogiri::HTML source(url)
     
-    parse_title_tags doc.at('.event-name').text
+    @full_title = doc.at('.event-name').text
+    parse_title_tags
     
     rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
     @image = URI::join(url, rel_image).to_s
@@ -107,15 +108,16 @@ class Hike
     open(url, 'Accept-Language' => 'en') { |f| f.read }
   end
 
-  def parse_title_tags raw_title
+  def parse_title_tags
+    working_title = @full_title
     tags = []
     loop do
-      match = raw_title.match(/^\[(.+?)\]\s*(.+)$/)
+      match = working_title.match(/^\[(.+?)\]\s*(.+)$/)
       break unless match
       tags << match[1]
-      raw_title = match[2]
+      working_title = match[2]
     end
-    @title = raw_title
+    @title = working_title
     @tags = tags
     return @title, @tags
   end
