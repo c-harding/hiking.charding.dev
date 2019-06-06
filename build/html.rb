@@ -63,7 +63,7 @@ class Hike
   end
 
   def available
-    capacity - registered - waiting
+    capacity - registered
   end
 
   def image_height
@@ -101,6 +101,7 @@ class Hike
 
   def save
     html = @@template.build_page(
+      canonical_link: "/#{link}",
       url: url, title: page_title,
       image: image, image_width: image_width, image_height: image_height)
     File.write("#{link}.html", html)

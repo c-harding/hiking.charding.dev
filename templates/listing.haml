@@ -2,6 +2,7 @@
 %html{lang: "en"}
   %head
     %meta{charset: "utf-8"}/
+    %link{rel: 'canonical', href: '/'}/
     %title Hikes with Charlie
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'}
     -#
@@ -114,7 +115,7 @@
             %ul
               %li= hike.day_date_time_string
               - if hike.available > 0
-                %li.available #{hike.available}/#{hike.capacity} spaces available
+                %li.available #{hike.registered}/#{hike.capacity} registered, #{hike.available} spaces available
               - else
                 %li.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
             %p= hike.desc

@@ -2,7 +2,6 @@ script:
 - "build/deploy.rb"
 
 language: ruby
-before_install:
 
 deploy:
   provider: pages
@@ -11,3 +10,6 @@ deploy:
   keep-history: true
   on:
     branch: master
+
+after_script:
+- "build/rebuild_facebook_previews.rb"
