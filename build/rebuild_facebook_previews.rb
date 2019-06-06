@@ -12,5 +12,7 @@ Dir['**/*.html'].each do |file|
   
   https = Net::HTTP.new(graph.host,graph.port)
   https.use_ssl = true
+  puts "Resetting Facebook cache for #{path}"
   https.post(graph.path, URI.encode_www_form(id: path, scrape: true, access_token: ENV['FB_TOKEN']))
+  puts "Reset Facebook cache for #{path}"
 end
