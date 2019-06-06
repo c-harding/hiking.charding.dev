@@ -9,7 +9,14 @@
   body {
     background-color: #EEE;
     font-family: Lato, sans-serif; }
-    body > heading {
+  
+  main {
+    width: 100%;
+    max-width: 70em;
+    margin: auto;
+    display: flex;
+    flex-direction: column; }
+    main > heading {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
@@ -18,18 +25,11 @@
       background-color: white;
       border-radius: 1em;
       margin: 1em 2em; }
-      body > heading > * {
+      main > heading > * {
         padding: 0 1em;
         margin: 0.5em 0; }
-      body > heading .hb-logo {
+      main > heading .hb-logo {
         font-family: Satisfy, cursive, sans-serif; }
-  
-  main {
-    width: 100%;
-    max-width: 70em;
-    margin: auto;
-    display: flex;
-    flex-direction: column; }
   
   a.card {
     overflow: hidden;
@@ -67,6 +67,7 @@
 </style>
 </head>
 <body>
+<main>
 <heading>
 <h1>Hiking with Charlie</h1>
 <p>
@@ -74,7 +75,6 @@ organised through
 <span class="hb-logo">Hiking Buddies</span>
 </p>
 </heading>
-<main>
 <a class="card" href="/drachenkopf">
 <img src="https://www.hiking-buddies.com/media/user_1122/img_7414-e1470732199716_9rMa8eX.jpg">
 <header>
