@@ -11,6 +11,10 @@
         background-color: white
         border-radius: 1em
         margin: 1em 2em
+      
+      =reset-link
+        color: inherit
+        text-decoration: inherit
 
       body
         background-color: #EEE
@@ -37,13 +41,16 @@
 
           .hb-logo
             font-family: Satisfy, cursive, sans-serif
+            +reset-link
+
+            &:hover
+              text-decoration: underline
       
       a.card
         overflow: hidden
         display: flex
         flex-direction: row
-        color: inherit
-        text-decoration: inherit
+        +reset-link
         +card
 
         img
@@ -78,7 +85,7 @@
         %h1 Hiking with Charlie
         %p
           organised through
-          %span.hb-logo Hiking Buddies
+          %a.hb-logo{href: 'https://hiking-buddies.com/'} Hiking Buddies
       - hikes.each do |hike|
         %a.card{href: hike.local_link}
           %img{src: hike.image}
