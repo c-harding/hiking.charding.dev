@@ -16,6 +16,13 @@
         background-color: #EEE
         font-family: Lato, sans-serif
 
+      main
+        width: 100%
+        max-width: 70em
+        margin: auto
+        display: flex
+        flex-direction: column
+
         > heading
           display: flex
           flex-direction: row
@@ -30,13 +37,6 @@
 
           .hb-logo
             font-family: Satisfy, cursive, sans-serif
-
-      main
-        width: 100%
-        max-width: 70em
-        margin: auto
-        display: flex
-        flex-direction: column
       
       a.card
         overflow: hidden
@@ -73,12 +73,12 @@
           header
             padding-top: 0
   %body
-    %heading
-      %h1 Hiking with Charlie
-      %p
-        organised through
-        %span.hb-logo Hiking Buddies
     %main
+      %heading
+        %h1 Hiking with Charlie
+        %p
+          organised through
+          %span.hb-logo Hiking Buddies
       - hikes.each do |hike|
         %a.card{href: hike.local_link}
           %img{src: hike.image}
