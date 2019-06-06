@@ -1,0 +1,94 @@
+!!!5
+%html{lang: "en"}
+  %head
+    %meta{charset: "utf-8"}/
+    %title Hikes with Charlie
+    -#
+      %meta{'http-equiv': 'Refresh', content: '0; url=https://xsanda.me'}
+    %link{rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Satisfy', type: 'text/css'}
+    :sass
+      =card
+        background-color: white
+        border-radius: 1em
+        margin: 1em 2em
+
+      body
+        background-color: #EEE
+        font-family: Lato, sans-serif
+
+        > heading
+          display: flex
+          flex-direction: row
+          flex-wrap: wrap
+          justify-content: space-evenly
+          align-items: end
+          +card
+
+          > *
+            padding: 0 1em
+            margin: 0.5em 0
+
+          .hb-logo
+            font-family: Satisfy, cursive, sans-serif
+
+      main
+        width: 100%
+        max-width: 70em
+        margin: auto
+        display: flex
+        flex-direction: column
+      
+      a.card
+        overflow: hidden
+        display: flex
+        flex-direction: row
+        color: inherit
+        text-decoration: inherit
+        +card
+
+        img
+          object-fit: cover
+          width: 50%
+          flex-grow: 0
+          flex-shrink: 0
+        header
+          padding: 1em
+          flex: 1 1 50%
+          ul
+            display: inline
+            padding: 0
+          li
+            list-style: none
+            display: inline
+            &:not(:first-child)::before
+              content: '• '
+          
+        @media only screen and (max-width: 700px)
+          flex-direction: column
+
+          img
+            width: unset
+            height: 30vw
+          
+          header
+            padding-top: 0
+  %body
+    %heading
+      %h1 Hiking with Charlie
+      %p
+        organised through
+        %span.hb-logo Hiking Buddies
+    %main
+      - hikes.each do |hike|
+        %a.card{href: hike.local_link}
+          %img{src: hike.image}
+          %header
+            %h2= hike.title
+            %ul
+              %li= hike.date_string
+              %li= hike.time_string
+              - if hike.available > 0
+                %li #{hike.available}/#{hike.capacity} spaces available
+              - else
+                %li #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
+            %p= hike.desc
