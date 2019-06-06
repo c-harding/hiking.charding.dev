@@ -59,7 +59,8 @@
         list-style: none;
         display: inline; }
         a.card header li:not(:first-child)::before {
-          content: "• "; }
+          content: "• ";
+          color: black; }
     @media only screen and (max-width: 700px) {
       a.card {
         flex-direction: column; }
@@ -68,6 +69,12 @@
           height: 30vw; }
         a.card header {
           padding-top: 0; } }
+  
+  .available {
+    color: green; }
+  
+  .full {
+    color: red; }
 </style>
 </head>
 <body>
@@ -82,11 +89,12 @@ organised through
 <a class="card" href="/drachenkopf">
 <img src="https://www.hiking-buddies.com/media/user_1122/img_7414-e1470732199716_9rMa8eX.jpg">
 <header>
-<h2>T4 - Drachenkopf [22.2 Km, 1500 m gain]</h2>
+<h2>Drachenkopf [22.2 Km, 1500 m gain]</h2>
 <ul>
 <li>16 Jun</li>
 <li>06:55</li>
-<li>10/10 registered, 10 waiting</li>
+<li>T4</li>
+<li class="full">10/10 registered, 10 waiting</li>
 </ul>
 <p>Who fancies a trip to the land of the dragon: Drachenkopf and Drachensee? This is a tough hike, with 1500 m ascent, some Grade I scrambling, and 22 km. It should be very rewarding, with great views over Zugspitze and Drachensee, where we will be able to cool off on the descent.</p>
 </header>
@@ -98,7 +106,7 @@ organised through
 <ul>
 <li>30 Jun</li>
 <li>08:15</li>
-<li>5/5 registered, 0 waiting</li>
+<li class="full">5/5 registered, 0 waiting</li>
 </ul>
 <p>Let's do a big ride orbiting Garmisch! Sights will include Plansee, Zugspitze, Walchensee and Kochelsee. Pace will likely be between 20 and 25 km/h excluding stops, so it should take around six to eight hours plus breaks. I will use a road bike.</p>
 </header>
@@ -110,7 +118,7 @@ organised through
 <ul>
 <li>7 Jul</li>
 <li>07:40</li>
-<li>2/5 spaces available</li>
+<li class="available">2/5 spaces available</li>
 </ul>
 <p>Salzburg is the furthest east you can reach within the Alps on a Bayern Ticket. From there, we will head west, climbing mountain passes and getting fantastic views of lakes and far-off mountains. </p>
 </header>
