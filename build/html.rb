@@ -7,6 +7,8 @@ require 'haml'
 require 'ostruct'
 require 'fastimage'
 require 'json'
+require 'active_support/inflector'
+require 'active_support/time'
 
 Haml::TempleEngine.options[:attr_wrapper] = '"'
 
@@ -54,12 +56,26 @@ class Hike
     date.strftime('%a %-d %b')
   end
 
+  def past?
+    date.to_date.past?
+  end
+
+  def upcoming?
+    not past?
+  end
+
   def time_string
     date.strftime('%H:%M')
   end
 
   def day_date_time_string
-    date.strftime('%a %-d %b, %H:%M')
+    if DateTime.now.year == date.year
+      date.strftime('%a %-d %b, %H:%M')
+    elsif past?
+      date.strftime('%a %-d %b %Y')
+    else
+      date.strftime('%a %-d %b %Y, %H:%M')
+    end
   end
 
   def available
@@ -81,6 +97,10 @@ class Hike
       case tag.downcase
       when 'cycle', 'cycling', 'bike', 'biking'
         { short: '🚲', full: '🚲 Cycling' }
+      when 'austria'
+        { short: '🇦🇹', full: '🇦🇹 Austria' }
+      when 'italy'
+        { short: '🇮🇹', full: '🇮🇹 Italy' }
       else
         { short: "[#{tag.titleize}]", full: tag.titleize }
       end
@@ -110,13 +130,18 @@ class Hike
     File.write("#{link}/index.html", html)
   end
 
-  def self.save_index(hikes)
+  def self.save_indices(hikes)
     template = Template.new('templates/listing.haml')
-    html = template.build_page(hikes: hikes.sort_by(&:date))
-    File.write('index.html', html)
+    save_index(template, 'index.html', hikes.filter(&:upcoming?).sort_by(&:date))
+    save_index(template, 'past.html', hikes.filter(&:past?).sort_by(&:date).reverse)
   end
 
   private
+
+  def self.save_index(template, file, hikes)
+    html = template.build_page(hikes: hikes, link: "/#{file.sub(/(index)?\.html$/,'')}")
+    File.write(file, html)
+  end
 
   def fetch_info
     doc = Nokogiri::HTML source(url)
@@ -183,5 +208,5 @@ if __FILE__ == $0
     hike
   end
 
-  Hike.save_index(hikes)
+  Hike.save_indices(hikes)
 end

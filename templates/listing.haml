@@ -114,7 +114,9 @@
                 %li= hike.grade
             %ul
               %li= hike.day_date_time_string
-              - if hike.available > 0
+              - if hike.past?
+                %li #{hike.registered} registered
+              - elsif hike.available > 0
                 %li.available #{hike.registered}/#{hike.capacity} registered, #{hike.available} spaces available
               - else
                 %li.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
