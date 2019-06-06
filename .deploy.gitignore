@@ -6,5 +6,5 @@ vendor/
 Gemfile
 build/
 hikes.yml
-templates/
+*.haml
 .travis.yml

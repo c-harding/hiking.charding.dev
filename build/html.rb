@@ -39,7 +39,7 @@ class Hike
   end
 
   def local_link
-    "/#{link}"
+    "/#{link}/"
   end
 
   def page_title
@@ -101,10 +101,13 @@ class Hike
 
   def save
     html = @@template.build_page(
-      canonical_link: "/#{link}",
+      canonical_link: local_link,
       url: url, title: page_title,
       image: image, image_width: image_width, image_height: image_height)
-    File.write("#{link}.html", html)
+      require 'fileutils'
+
+    FileUtils.mkdir_p link
+    File.write("#{link}/index.html", html)
   end
 
   def self.save_index(hikes)
@@ -175,7 +178,6 @@ end
 
 if __FILE__ == $0
   hikes = YAML.load_file('hikes.yml').map do |link, hike|
-    raise 'Cannot overwrite index' if link == 'index'
     hike = Hike.new(hike, link)
     hike.save
     hike
