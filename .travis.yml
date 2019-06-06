@@ -2,7 +2,6 @@ script:
 - "build/deploy.rb"
 
 language: ruby
-cache: bundler
 
 deploy:
   provider: pages

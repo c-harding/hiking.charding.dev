@@ -8,3 +8,4 @@ gem "haml", "~> 5.1"
 gem "fastimage", "~> 2.1"
 
 gem "haml-contrib", "~> 1.0"
+gem 'activesupport', '~> 5.2', '>= 5.2.3'
