@@ -181,7 +181,7 @@ class Hike
       tags << match[1]
       working_title = match[2]
     end
-    if (match = working_title.match(/^(.+)\s*\[(.+?)\]$/))
+    if (match = working_title.match(/^(.*\S)\s*\[(.+?)\]$/))
       working_title = match[1]
       @stats = match[2]
     else
