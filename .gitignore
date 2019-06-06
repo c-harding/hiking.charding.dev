@@ -1,0 +1,10 @@
+Gemfile.lock
+_site/
+.sass-cache/
+vendor/
+Gemfile
+build/
+.bundle/
+hikes.yml
+templates/
+.travis.yml
