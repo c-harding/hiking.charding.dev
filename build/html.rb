@@ -43,7 +43,7 @@ class Hike
   end
 
   def page_title
-    "#{date_string}: #{full_title} - Hiking Buddies Munich"
+    "#{date_string}: #{short_tags.join(' ')} #{title}#{stats && " [#{stats.join(' ')}]"} - Hiking Buddies Munich"
   end
 
   def date_string
@@ -76,15 +76,23 @@ class Hike
     @image_width
   end
 
-  def tags
+  def short_long_tags
     @tags.flat_map { |tag| tag.split(/,\s*/) }.map do |tag|
       case tag.downcase
       when 'cycle', 'cycling', 'bike', 'biking'
-        '🚲 Cycling'
+        { short: '🚲', full: '🚲 Cycling' }
       else
-        tags.titleize
+        { short: "[#{tag.titleize}]", full: tag.titleize }
       end
     end
+  end
+
+  def tags
+    short_long_tags.map { |tag| tag[:long] }
+  end
+
+  def short_tags
+    short_long_tags.map { |tag| tag[:short] }
   end
 
   def stats
