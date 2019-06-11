@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-puts `build/html.rb`
-File.rename '.deploy.gitignore', '.gitignore'
+exit($?) unless system(`build/html.rb`)
+exit($?) unless system(`build/rebuild_facebook_previews.rb`)
 
-exit($?.exitstatus)
+File.rename '.deploy.gitignore', '.gitignore'
