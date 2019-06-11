@@ -5,6 +5,6 @@ vendor/
 .bundle/
 Gemfile
 build/
-hikes.yml
+*.yml
 *.haml
-.travis.yml
+*.sass
