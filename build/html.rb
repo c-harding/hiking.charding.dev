@@ -135,6 +135,7 @@ class Hike
     template = Template.new('templates/listing.haml')
     save_index(template, 'index.html', hikes.select(&:upcoming?).sort_by(&:date))
     save_index(template, 'past.html', hikes.select(&:past?).sort_by(&:date).reverse)
+    save_index(template, 'all.html', hikes.sort_by(&:date).reverse)
   end
 
   private
@@ -205,6 +206,7 @@ end
 if __FILE__ == $0
   hikes = YAML.load_file('hikes.yml').map do |link, hike|
     hike = Hike.new(hike, link)
+    puts "Saving '#{hike.title}' to /#{link}/"
     hike.save
     hike
   end
