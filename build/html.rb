@@ -39,7 +39,8 @@ class Hike
   end
 
   attr_reader :id, :desc, :full_title, :title, :date, :link
-  attr_reader :capacity, :registered, :waiting, :image, :grade
+  attr_reader :capacity, :registered, :waiting, :image
+  attr_reader :category, :grade, :distance, :ascent
 
   def url
     hb "/routes/events/#{@id}/"
@@ -98,10 +99,8 @@ class Hike
   end
 
   def short_full_tags
-    @tags.flat_map { |tag| tag.split(/,\s*/) }.map do |tag|
+    @tags.map do |tag|
       case tag.downcase
-      when 'cycle', 'cycling', 'bike', 'biking'
-        { short: '🚲', full: '🚲 Cycling' }
       when 'austria'
         { short: '🇦🇹', full: '🇦🇹 Austria' }
       when 'italy'
@@ -122,6 +121,14 @@ class Hike
 
   def stats
     (@stats.split(/,\s*/) || []).map { |stat| stat.downcase }
+  end
+
+  def category
+    @category.name
+  end
+
+  def category_icon
+    %Q(<i class="fas #{@category.icon}"></i>)
   end
 
   def save
@@ -180,18 +187,59 @@ class Hike
     working_title = @full_title
     tags = []
     while (match = working_title.match(/^\[(.+?)\]\s*(.+)$/))
-      tags << match[1]
+      tags.push(*match[1].split(/,\s*/))
       working_title = match[2]
     end
     if (match = working_title.match(/^(.*\S)\s*\[(.+?)\]$/))
       working_title = match[1]
-      @stats = match[2]
-    else
-      @stats = nil
+      parse_stats(match[2])
     end
     @title = working_title
-    @tags = tags
-    return @title, @tags
+    
+    @tags, @category = parse_category(tags)
+  end
+
+  def parse_stats(stats)
+    stats.split(/,\s*/).each do |stat|
+      if (match = stat.match /^(.+[^a-z] km)$/i)
+        
+        @distance = match[1].strip.downcase
+      elsif (match = stat.match /^((.+[^a-z])m)\s+(asc(ent|\.)?|gain)$/i)
+        @ascent = match[1].strip.downcase
+      else
+        STDERR.puts "Unrecognised stat: <#{stat}> [#{stats}]"
+      end
+    end
+  end
+
+  class Category
+    def initialize(name, icon, *other_terms)
+      @name = name
+      @icon = icon
+      @terms = other_terms = Set[name.to_s, *other_terms].freeze
+    end
+  
+    attr_reader :name, :icon
+
+    def include? tag
+      @terms.nil? or @terms.include? tag
+    end
+  end
+
+  @@categories = [
+    Category.new('cycling', 'fa-biking', 'cycle', 'bike', 'biking'),
+    Category.new('hiking', 'fa-hiking', 'hike') # default
+  ].freeze
+
+  def parse_category(tags)
+    category = nil
+    tags = tags.filter { |tag|
+      next true if category
+      lower_tag = tag.downcase
+      category = @@categories.find { |category| category.include? lower_tag }
+      false
+    }
+    return tags, category || @@categories.last
   end
 
   def hb url

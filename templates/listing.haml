@@ -9,6 +9,7 @@
       %meta{'http-equiv': 'Refresh', content: '0; url=https://xsanda.me'}
     %link{rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Satisfy', type: 'text/css'}
     %link{rel: 'stylesheet', href: '/style/listing.css', type: 'text/css'}
+    %script{src: 'https://kit.fontawesome.com/772a32a5d5.js'}
   %body
     %main
       %heading
@@ -23,10 +24,17 @@
           %aside
             %h2= hike.title
             %ul
+              %li= hike.category_icon
               - hike.tags.each do |tag|
                 %li= tag
-              - hike.stats.each do |stat|
-                %li= stat
+              - if hike.distance
+                %li
+                  ↔︎
+                  = hike.distance
+              - if hike.ascent
+                %li
+                  ↗︎
+                  = hike.ascent
               - if hike.grade
                 %li= hike.grade
             %ul{data: {id: hike.id}}
