@@ -6,6 +6,7 @@ require 'nokogiri'
 require 'haml'
 require 'ostruct'
 require 'fastimage'
+require 'fileutils'
 require 'json'
 require 'active_support/inflector'
 require 'active_support/time'
@@ -17,8 +18,12 @@ class Template
     @template = File.read template
   end
 
-  def build_page(properties = {})
-    Haml::Engine.new(@template).to_html(OpenStruct.new(properties))
+  def build_page(object, variables = {})
+    if object.is_a? Hash
+      variables = object
+      object = nil
+    end
+    Haml::Engine.new(@template).to_html(object || Object.new, variables)
   end
 end
 
@@ -92,7 +97,7 @@ class Hike
     @image_width
   end
 
-  def short_long_tags
+  def short_full_tags
     @tags.flat_map { |tag| tag.split(/,\s*/) }.map do |tag|
       case tag.downcase
       when 'cycle', 'cycling', 'bike', 'biking'
@@ -108,11 +113,11 @@ class Hike
   end
 
   def tags
-    short_long_tags.map { |tag| tag[:full] }
+    short_full_tags.map { |tag| tag[:full] }
   end
 
   def short_tags
-    short_long_tags.map { |tag| tag[:short] }
+    short_full_tags.map { |tag| tag[:short] }
   end
 
   def stats
@@ -120,11 +125,7 @@ class Hike
   end
 
   def save
-    html = @@template.build_page(
-      canonical_link: local_link,
-      url: url, title: page_title,
-      image: image, image_width: image_width, image_height: image_height)
-      require 'fileutils'
+    html = @@template.build_page(self)
 
     FileUtils.mkdir_p link
     File.write("#{link}/index.html", html)
