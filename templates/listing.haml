@@ -17,34 +17,34 @@
         %p
           organised through
           %a.hb-logo{href: 'https://www.hiking-buddies.com/routes/'} Hiking Buddies
-      - hikes.each do |hike|
-        %a.card{href: hike.local_link}
+      - events.each do |event|
+        %a.card{href: event.local_link}
           %figure
-            %img{src: hike.image}
+            %img{src: event.image}
           %aside
-            %h2= hike.title
+            %h2= event.title
             %ul
-              %li= hike.category_icon
-              - hike.tags.each do |tag|
+              %li= event.category_icon
+              - event.tags.each do |tag|
                 %li= tag
-              - if hike.distance
+              - if event.distance
                 %li
                   ↔︎
-                  = hike.distance
-              - if hike.ascent
+                  = event.distance
+              - if event.ascent
                 %li
                   ↗︎
-                  = hike.ascent
-              - if hike.grade
-                %li= hike.grade
-            %ul{data: {id: hike.id}}
-              %li= hike.day_date_time_string
-              - if hike.past?
-                %li #{hike.registered} registered
-              - elsif hike.available > 0
+                  = event.ascent
+              - if event.grade
+                %li= event.grade
+            %ul{data: {id: event.id}}
+              %li= event.day_date_time_string
+              - if event.past?
+                %li #{event.registered} registered
+              - elsif event.available > 0
                 %li.capacity.available
-                  #{hike.registered}/#{hike.capacity} registered,
-                  #{hike.available} #{'space'.pluralize(hike.available)} available
+                  #{event.registered}/#{event.capacity} registered,
+                  #{event.available} #{'space'.pluralize(event.available)} available
               - else
-                %li.capacity.full #{hike.registered}/#{hike.capacity} registered, #{hike.waiting} waiting
-            %p= hike.desc
+                %li.capacity.full #{event.registered}/#{event.capacity} registered, #{event.waiting} waiting
+            %p= event.desc

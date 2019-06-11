@@ -17,7 +17,7 @@ def parse(input)
   when "css", "map"
     return
   else
-    STDERR.puts "Unable to compile #{input}: unrecogmised extension"
+    STDERR.puts "Unable to compile #{input}: unrecognised extension"
   end
   parse output
 end

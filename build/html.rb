@@ -13,23 +13,38 @@ require 'active_support/time'
 
 Haml::TempleEngine.options[:attr_wrapper] = '"'
 
+# A HAML template, for rendering a page.
 class Template
+  # @param [String] template The path to the template, as a HAML file
   def initialize(template)
-    @template = File.read template
+    @template = Haml::Engine.new(File.read(template))
   end
 
+  # Use the template to generate an html file, with the object and variables
+  # provided available in the template.
+  #
+  # @param [Object] object The object on which methods in the template will
+  #   be called.
+  # @param [Hash] variables Additional variables accessible in
+  #   the template.
+  # @return [String] the rendered HTML file
   def build_page(object, variables = {})
     if object.is_a? Hash
       variables = object
       object = nil
     end
-    Haml::Engine.new(@template).to_html(object || Object.new, variables)
+    @template.to_html(object || Object.new, variables)
   end
 end
 
-class Hike
-  @@template = Template.new 'templates/hike.haml'
+# An event, used for creating a page for social media previewing, as well as
+# for showing up in listings.
+class Event
+  # The template to use when initialising the event redirect pages.
+  @@HIKE_TEMPLATE = Template.new('templates/event.haml').freeze
   
+  # @param [YAML] yaml The description of the event in the events.yml file.
+  # @param [String] link The URI component representing this item.
   def initialize(yaml, link)
     @link = link
     @id = yaml['id']
@@ -38,42 +53,64 @@ class Hike
     fetch_participants
   end
 
-  attr_reader :id, :desc, :full_title, :title, :date, :link
+  attr_reader :id, :desc, :title, :date, :link
   attr_reader :capacity, :registered, :waiting, :image
   attr_reader :category, :grade, :distance, :ascent
 
+  # @return [String] the URL to the event on the HB website
   def url
     hb "/routes/events/#{@id}/"
   end
 
+  # @return [String] the relative URL to the event’s page on this site
   def local_link
     "/#{link}/"
   end
 
+  # @return [String] the title attribute for this page, used as a preview in
+  #   social media
   def page_title
     "#{date_string}: #{short_tags.join(' ')} #{title}#{stats && " [#{stats.join(' ')}]"} - Hiking Buddies Munich"
   end
 
+  # @return [String] the date of the event, e.g. 4 Jun
   def date_string
     date.strftime('%-d %b')
   end
 
+  # @return [String] the day and date of the event, e.g. Mon 4 Jun
   def day_date_string
     date.strftime('%a %-d %b')
   end
 
-  def past?
-    date.to_date.past?
-  end
-
-  def upcoming?
-    not past?
-  end
-
+  # @return [String] the time of the event, e.g. 09:30
   def time_string
     date.strftime('%H:%M')
   end
 
+  # Has this event happened? Note that this returns false on the day of the
+  # event, but true on the following day, even for multiday events.
+  #
+  # @todo Add support for multiday events, and for determining if the event is
+  #   ongoing.
+  #
+  # @return [Boolean]
+  def past?
+    date.to_date.past?
+  end
+
+  # Is this event yet to happen?
+  #
+  # @see #past?
+  #
+  # @return [Boolean]
+  def upcoming?
+    not past?
+  end
+
+  # @return [String] the date of the event, and additionally the year of the
+  #   event if it is not this year, and the time of the event if it is this
+  #   year or in the future.
   def day_date_time_string
     if DateTime.now.year == date.year
       date.strftime('%a %-d %b, %H:%M')
@@ -84,78 +121,168 @@ class Hike
     end
   end
 
+  # @return [Integer] the number of spaces still available for the event,
+  # ignoring car seat restrictions.
   def available
     capacity - registered
   end
 
+  # Get the height of the header image for the event. This is lazy, and so the
+  # image dimensions are not looked up until needed.
+  #
+  # @return [Integer]
   def image_height
     fetch_image_info unless instance_variable_defined? :@image_height
     @image_height
   end
 
+  # Get the width of the header image for the event. This is lazy, and so the
+  # image dimensions are not looked up until needed.
+  #
+  # @return [Integer]
   def image_width
     fetch_image_info unless instance_variable_defined? :@image_width
     @image_width
   end
 
+  # A pair of representations for an event tag: a {#short} and a {#long} name,
+  # for use with the title and alone respectively.
+  class Tag
+    # @overload initialize(short, long)
+    #   @param [<String>] short The {#short} form of the tag.
+    #   @param [<String>] long The {#long} form of the tag.
+    # 
+    # @overload initialize(raw_tag)
+    #   Parse the tag from the title to generate the short and long forms.
+    #
+    #   The long form is the same as extracted, and the short form is not
+    #   shortened, but surrounded by square brackets.
+    #
+    #   @param [<String>] raw_tag The tag originally extracted from the
+    #     title, without any processing.
+    #
+    def initialize(short, long = nil)
+      if long.nil?
+        initialize("[#{tag.titleize}]", tag.titleize)
+      else
+        @short = short.freeze
+        @long = long.freeze
+      end
+    end
+
+    # @return [String] the short form of the tag, safe to be prefixed to a
+    #   title.
+    attr_reader :short
+    # @return [String] the long form of the tag, used in the event preview and
+    #   delimited.
+    attr_reader :long
+  end
+
+  # Get the tags extracted from the event title.
+  #
+  # @return [Array<Tag>]
   def short_full_tags
     @tags.map do |tag|
       case tag.downcase
-      when 'austria'
-        { short: '🇦🇹', full: '🇦🇹 Austria' }
-      when 'italy'
-        { short: '🇮🇹', full: '🇮🇹 Italy' }
-      else
-        { short: "[#{tag.titleize}]", full: tag.titleize }
+      when 'austria' then Tag.new('🇦🇹', '🇦🇹 Austria')
+      when 'italy' then Tag.new('🇮🇹', '🇮🇹 Italy')
+      else Tag.new(tag)
       end
     end
   end
 
+  # @return [Array<String>] the short form of the tags extracted from the
+  #   title, either in emoji/icon form or surrounded with square brackets.
   def tags
-    short_full_tags.map { |tag| tag[:full] }
+    short_full_tags.map(&:long)
   end
 
+  # @return [Array<String>] the long form of the tags extracted from the title
   def short_tags
-    short_full_tags.map { |tag| tag[:short] }
+    short_full_tags.map(&:short)
   end
 
-  def stats
-    (@stats.split(/,\s*/) || []).map { |stat| stat.downcase }
-  end
-
+  # @return [String] the event type, e.g. hiking or biking
   def category
     @category.name
   end
 
+  # @return [String] the category as an icon identifier for FontAwesome
+  # @see #category
   def category_icon
+    @category.icon
+  end
+
+  # @return [String] the category as an HTML snippet
+  # @see #category
+  def category_icon_html
     %Q(<i class="fas #{@category.icon}"></i>)
   end
 
+  # Generate an HTML file for the redirect to the event page for this event,
+  # including the metadata for social media, and save it in the location
+  # determined by #link.
+  #
+  # @return [String] the HTML contents of the file.
   def save
-    html = @@template.build_page(self)
+    html = @@HIKE_TEMPLATE.build_page(self)
 
-    FileUtils.mkdir_p link
+    FileUtils.mkdir_p(link)
     File.write("#{link}/index.html", html)
+    html
   end
 
-  def self.save_indices(hikes)
+  # Generate event redirect pages with social media metadata.
+  #
+  # Iterate through the events in the +events.yml+ file, and generate the
+  # redirect page for it according to the {@@HIKE_TEMPLATE} template.
+  #
+  # @return [Array<Event>] The array of {Event +Event+s}, for use in the
+  #   indices.
+  #
+  def self.save_events
+    events = YAML.load_file('events.yml').map do |link, event|
+      event = Event.new(event, link)
+      puts "Saving '#{event.title}' to /#{link}/"
+      event.save
+      event
+    end
+  end
+
+  # Create listing pages of the events given, using the +listing.haml+
+  # template.
+  #
+  # Different pages are generated, including for the upcoming and past events.
+  #
+  # @param [Array<Event>] events an array of {Event +Event+s} to include.
+  def self.save_indices(events)
     template = Template.new('templates/listing.haml')
-    save_index(template, 'index.html', hikes.select(&:upcoming?).sort_by(&:date))
-    save_index(template, 'past.html', hikes.select(&:past?).sort_by(&:date).reverse)
-    save_index(template, 'all.html', hikes.sort_by(&:date).reverse)
+    save_index(template, 'index.html', events.select(&:upcoming?).sort_by(&:date))
+    save_index(template, 'past.html', events.select(&:past?).sort_by(&:date).reverse)
+    save_index(template, 'all.html', events.sort_by(&:date).reverse)
   end
 
   private
 
-  def self.save_index(template, file, hikes)
-    html = template.build_page(hikes: hikes, link: "/#{file.sub(/(index)?\.html$/,'')}")
+  # Create a listing page of the events given at the given URL, using the
+  # given template, and save it to the given URL.
+  #
+  # @param [Template] template the template to use to render the listing.
+  # @param [String] file the path to the file where the listing will be saved.
+  # @param [Array<Event>] events an array of events to include in order.
+  def self.save_index(template, file, events)
+    html = template.build_page(events: events, link: "/#{file.sub(/(index)?\.html$/,'')}")
     File.write(file, html)
   end
 
+  # Fetch information about the event from the Hiking Buddies Website.
+  #
+  # This sets {#image}, {#date} and {#capacity}, as well as everything that
+  # {#parse_title_tags} sets.
   def fetch_info
-    doc = Nokogiri::HTML source(url)
+    doc = Nokogiri::HTML(source(url))
     
-    parse_title_tags doc.at('.event-name').text
+    parse_title_tags(doc.at('.event-name').text)
     
     rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
     @image = URI::join(url, rel_image).to_s
@@ -165,26 +292,35 @@ class Hike
 
     @capacity = doc.at('input[name=max_participants]')["value"].to_i
   end
-  
+
+  # Fetch information about the event from the Hiking Buddies Website.
+  #
+  # This sets {#registered} and {#waiting}, so {#available} can be calculated
+  # too.
   def fetch_participants
     json = JSON.parse(source(hb "/routes/get_event_details/?event_id=#{@id}"))
     @registered = JSON.parse(json['participants']).length
     @waiting = JSON.parse(json['participants_waiting']).length
   end
   
+  # @return [String] The contents of the URL, with the language header set to
+  # avoid a crash on the Hiking Buddies server.
   def source(url)
     open(url, 'Accept-Language' => 'en') { |f| f.read }
   end
 
+  # Convert the raw title into tags, stats and the grade.
+  #
+  # This sets {#grade}, {#tags}, {#category} and {#title}, as well as the
+  # stats set by {#parse_stats}.
   def parse_title_tags raw_title
     if (match = raw_title.match(/^(T\d)\s*-\s*(.+)$/))
       @grade = match[1]
-      @full_title = match[2]
+      working_title = match[2]
     else
       @grade = nil
-      @full_title = raw_title
+      working_title = raw_title
     end
-    working_title = @full_title
     tags = []
     while (match = working_title.match(/^\[(.+?)\]\s*(.+)$/))
       tags.push(*match[1].split(/,\s*/))
@@ -199,10 +335,16 @@ class Hike
     @tags, @category = parse_category(tags)
   end
 
+  # Extract event statistics from the title.
+  #
+  # The title usually contains a stats block like +[1.2 Km, 345 m gain]+.
+  #
+  # This function updates @distance and @ascent.
+  #
+  # @param [String] stats the raw statistics block contents from the title.
   def parse_stats(stats)
     stats.split(/,\s*/).each do |stat|
       if (match = stat.match /^(.+[^a-z] km)$/i)
-        
         @distance = match[1].strip.downcase
       elsif (match = stat.match /^((.+[^a-z])m)\s+(asc(ent|\.)?|gain)$/i)
         @ascent = match[1].strip.downcase
@@ -212,52 +354,79 @@ class Hike
     end
   end
 
+  # A container for representing the different categories an event can be,
+  # e.g. hiking and biking.
   class Category
     def initialize(name, icon, *other_terms)
       @name = name
       @icon = icon
       @terms = other_terms = Set[name.to_s, *other_terms].freeze
+      @used = false
     end
   
-    attr_reader :name, :icon
+    # @return [String] The name of the category
+    attr_reader :name
 
+    # @return [String] The FontAwesome type
+    attr_reader :icon
+
+    def used?
+      @used
+    end
+
+    # Check if the category has been used at all.
     def include? tag
-      @terms.nil? or @terms.include? tag
+      return false unless @terms.nil? or @terms.include? tag
+      @used = true
+      return true
     end
   end
 
+  # The categories that an event can fall under.
+  #
+  # The final item is the default, for when no other category fits.
   @@categories = [
     Category.new('cycling', 'fa-biking', 'cycle', 'bike', 'biking'),
     Category.new('hiking', 'fa-hiking', 'hike') # default
   ].freeze
 
+  # Search through the tags in the title, extracting the first category tag,
+  # or defaulting to the last category in {@@categories}.
+  #
+  # @param [Array<String>] tags the tags parsed from the title, to scan
+  #
+  # @return [Array<String>] the unused tags
+  # @return [Category] the category found
   def parse_category(tags)
     category = nil
     tags = tags.filter { |tag|
       next true if category
       lower_tag = tag.downcase
       category = @@categories.find { |category| category.include? lower_tag }
-      false
+      next false
     }
     return tags, category || @@categories.last
   end
 
+  # Create an absolute URL to the Hiking Buddies website.
+  #
+  # @param [String] url the relative URL to an item on the HB website.
+  #
+  # @return [String] an absolute link to +url+.
   def hb url
     URI::join('https://www.hiking-buddies.com/', url).to_s
   end
 
+  # Fetch the dimensions of the event’s header {#image}.
+  #
+  # @return [Integer] the *width* of the image in pixels.
+  # @return [Integer] the *height* of the image in pixels.
   def fetch_image_info
     @image_width, @image_height = FastImage.size(image)
   end
 end
 
 if __FILE__ == $0
-  hikes = YAML.load_file('hikes.yml').map do |link, hike|
-    hike = Hike.new(hike, link)
-    puts "Saving '#{hike.title}' to /#{link}/"
-    hike.save
-    hike
-  end
-
-  Hike.save_indices(hikes)
+  events = Event.save_events()
+  Event.save_indices(events)
 end

@@ -1,3 +1,4 @@
 exclude:
   - CNAME
   - README
+  - Gemfile
