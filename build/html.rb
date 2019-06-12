@@ -367,7 +367,7 @@ class Event
       hash = names.last.is_a?(Hash) ? names.pop : {}
       @icon = hash[:icon]
       @emoji = hash[:icon]
-      @terms = Set[names].freeze
+      @terms = Set[*names].freeze
       @used = false
     end
   
