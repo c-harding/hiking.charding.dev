@@ -70,8 +70,9 @@ class Event
   # @return [String] the title attribute for this page, used as a preview in
   #   social media
   def page_title
-    "#{date_string}: #{short_tags.join(' ')} #{title}#{(distance || ascent) &&
-      " [#{[distance, "#{ascent} asc."].join(', ')}]"} - Hiking Buddies Munich"
+    "#{date_string}:#{short_tags.map { |x| " #{x}" }.join} #{title}"\
+    "#{(distance || ascent) && " [#{[distance, "#{ascent} asc."].join(', ')}]"} "\
+      "- Hiking Buddies Munich"
   end
 
   # @return [String] the date of the event, e.g. 4 Jun
@@ -409,14 +410,12 @@ class Event
   # @return [Category] the category found
   def parse_category(tags)
     category = nil
-    p tags
     tags = tags.select { |tag|
       next true if category
       lower_tag = tag.downcase
       category = @@categories.find { |category| category.include? lower_tag }
       next !category
     }
-    p tags
     return tags, category || @@categories.last
   end
 
