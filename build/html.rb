@@ -409,7 +409,7 @@ class Event
   # @return [Category] the category found
   def parse_category(tags)
     category = nil
-    tags = tags.filter { |tag|
+    tags = tags.select { |tag|
       next true if category
       lower_tag = tag.downcase
       category = @@categories.find { |category| category.include? lower_tag }
