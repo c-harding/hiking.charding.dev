@@ -164,7 +164,7 @@ class Event
     #
     def initialize(short, long = nil)
       if long.nil?
-        initialize("[#{tag.titleize}]", tag.titleize)
+        initialize("[#{short.titleize}]", short.titleize)
       else
         @short = short.freeze
         @long = long.freeze
@@ -409,12 +409,14 @@ class Event
   # @return [Category] the category found
   def parse_category(tags)
     category = nil
+    p tags
     tags = tags.select { |tag|
       next true if category
       lower_tag = tag.downcase
       category = @@categories.find { |category| category.include? lower_tag }
-      next false
+      next !category
     }
+    p tags
     return tags, category || @@categories.last
   end
 
