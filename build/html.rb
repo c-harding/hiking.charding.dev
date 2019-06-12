@@ -70,7 +70,8 @@ class Event
   # @return [String] the title attribute for this page, used as a preview in
   #   social media
   def page_title
-    "#{date_string}:#{short_tags.map { |x| " #{x}" }.join} #{title}"\
+    "#{date_string}:"\
+    "#{[*category_emoji,*short_tags].map { |x| " #{x}" }.join} #{title}"\
     "#{(distance || ascent) && " [#{[distance, "#{ascent} asc."].join(', ')}]"} "\
       "- Hiking Buddies Munich"
   end
@@ -367,7 +368,7 @@ class Event
       @name = names.first
       hash = names.last.is_a?(Hash) ? names.pop : {}
       @icon = hash[:icon]
-      @emoji = hash[:icon]
+      @emoji = hash[:emoji]
       @terms = Set[*names].freeze
       @used = false
     end
