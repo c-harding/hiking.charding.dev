@@ -70,7 +70,8 @@ class Event
   # @return [String] the title attribute for this page, used as a preview in
   #   social media
   def page_title
-    "#{date_string}: #{short_tags.join(' ')} #{title}#{stats && " [#{stats.join(' ')}]"} - Hiking Buddies Munich"
+    "#{date_string}: #{short_tags.join(' ')} #{title}#{(distance || ascent) &&
+      " [#{[distance, "#{ascent} asc."].join(', ')}]"} - Hiking Buddies Munich"
   end
 
   # @return [String] the date of the event, e.g. 4 Jun
@@ -209,14 +210,18 @@ class Event
 
   # @return [String] the category as an icon identifier for FontAwesome
   # @see #category
-  def category_icon
-    @category.icon
+  def category_emoji
+    @category.emoji
   end
 
   # @return [String] the category as an HTML snippet
   # @see #category
-  def category_icon_html
-    %Q(<i class="fas #{@category.icon}"></i>)
+  def category_icon
+    if @category.icon
+      %Q(<i class="fas #{@category.icon}"></i>)
+    else
+      @category.emoji
+    end
   end
 
   # Generate an HTML file for the redirect to the event page for this event,
@@ -357,18 +362,23 @@ class Event
   # A container for representing the different categories an event can be,
   # e.g. hiking and biking.
   class Category
-    def initialize(name, icon, *other_terms)
-      @name = name
-      @icon = icon
-      @terms = other_terms = Set[name.to_s, *other_terms].freeze
+    def initialize(*names)
+      @name = names.first
+      hash = names.last.is_a?(Hash) ? names.pop : {}
+      @icon = hash[:icon]
+      @emoji = hash[:icon]
+      @terms = Set[names].freeze
       @used = false
     end
   
-    # @return [String] The name of the category
+    # @return [String] the name of the category
     attr_reader :name
 
-    # @return [String] The FontAwesome type
+    # @return [String] the FontAwesome icon name
     attr_reader :icon
+
+    # @return [String] the emoji of the category
+    attr_reader :emoji
 
     def used?
       @used
@@ -386,8 +396,8 @@ class Event
   #
   # The final item is the default, for when no other category fits.
   @@categories = [
-    Category.new('cycling', 'fa-biking', 'cycle', 'bike', 'biking'),
-    Category.new('hiking', 'fa-hiking', 'hike') # default
+    Category.new('cycling', 'cycle', 'bike', 'biking', icon: 'fa-biking', emoji: '🚴‍'),
+    Category.new('hiking', 'hike', icon: 'fa-hiking') # default
   ].freeze
 
   # Search through the tags in the title, extracting the first category tag,
