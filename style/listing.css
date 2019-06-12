@@ -14,7 +14,7 @@ main {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-evenly;
-    align-items: end;
+    align-items: flex-end;
     background-color: white;
     border-radius: 1em;
     margin: 1em 2em; }
