@@ -5,11 +5,9 @@
     %link{rel: 'canonical', href: '/'}/
     %title Hiking with Charlie
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'}
-    -#
-      %meta{'http-equiv': 'Refresh', content: '0; url=https://xsanda.me'}
-    %link{rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Satisfy', type: 'text/css'}
     %link{rel: 'stylesheet', href: '/style/listing.css', type: 'text/css'}
     %script{src: 'https://kit.fontawesome.com/772a32a5d5.js'}
+    %style#category-style-sheet
   %body
     %main
       %heading
@@ -17,8 +15,19 @@
         %p
           organised through
           %a.hb-logo{href: 'https://www.hiking-buddies.com/routes/'} Hiking Buddies
+      %nav
+        %ul
+          %li<>
+            %a{class: (:this if self_link? '/'), href: '/'} Upcoming
+          %li<>
+            %a{class: (:this if self_link? '/past'), href: '/past'} Past
+        %ul.category-selector
+          - categories.each do |category|
+            %li<>
+              %a{data: {category: category.name}, class: category.name, href: "#category-#{category.name}"}
+                = category.html_icon
       - events.each do |event|
-        %a.card{href: event.local_link}
+        %a.card{href: event.local_link, class: event.category}
           %figure
             %img{src: event.image}
           %aside
@@ -81,4 +90,32 @@
           permalink.classList.remove('copied');
         }, 1000);
         document.activeElement.blur();
+      });
+
+      function changeHash(newHash) {
+        const match = location.hash.match(/^(.*?)#category-([-\w]+)(.*)$/);
+        if (match && match[2] == newHash) location.hash = match[1] + match[3];
+        else if (match) location.hash = `${match[1]}#category-${newHash}${match[3]}`;
+        else location.hash = `#category-${newHash}`;
+      }
+
+      function onHashChange() {
+        const match = location.hash.match(/#category-([-\w]+)/);
+        const category = match && match[1];
+
+        const sheet = document.getElementById('category-style-sheet');
+        
+        sheet.innerText = category ? `
+          .card:not(.${category}) { display: none; }
+          .category-selector .${category}:not(:hover) { background-color: #ccc; }
+        ` : '';
+      }
+      window.addEventListener("hashchange", onHashChange);
+      onHashChange();
+
+      document.querySelector('.category-selector').addEventListener('click', e => {
+        const link = e.target.closest('.category-selector > li > a');
+        if (link === null) return;
+        changeHash(link.dataset.category);
+        e.preventDefault();
       });

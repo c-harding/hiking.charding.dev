@@ -336,11 +336,7 @@ class Event < RawEvent
   # @return [String] the category as an HTML snippet
   # @see #category
   def category_icon
-    if @category.icon
-      %Q(<i class="fas #{@category.icon}"></i>)
-    else
-      @category.emoji
-    end
+    @category.html_icon
   end
 
   # Generate an HTML file for the redirect to the event page for this event,
@@ -373,31 +369,7 @@ class Event < RawEvent
     end
   end
 
-  # Create listing pages of the events given, using the +listing.haml+
-  # template.
-  #
-  # Different pages are generated, including for the upcoming and past events.
-  #
-  # @param [Array<Event>] events an array of {Event +Event+s} to include.
-  def self.save_indices(events)
-    template = Template.new('templates/listing.haml')
-    save_index(template, 'index.html', events.select(&:upcoming?).sort_by(&:date))
-    save_index(template, 'past.html', events.select(&:past?).sort_by(&:date).reverse)
-    save_index(template, 'all.html', events.sort_by(&:date).reverse)
-  end
-
   private
-
-  # Create a listing page of the events given at the given URL, using the
-  # given template, and save it to the given URL.
-  #
-  # @param [Template] template the template to use to render the listing.
-  # @param [String] file the path to the file where the listing will be saved.
-  # @param [Array<Event>] events an array of events to include in order.
-  def self.save_index(template, file, events)
-    html = template.build_page(events: events, link: "/#{file.sub(/(index)?\.html$/,'')}")
-    File.write(file, html)
-  end
 
   # Fetch information about the event from the Hiking Buddies Website.
   #
@@ -479,6 +451,16 @@ class Event < RawEvent
       @used
     end
 
+    # @return [String] the category icon as an HTML snippet
+    # @see #category
+    def html_icon
+      if @icon
+        %Q(<i class="fas fa-fw #{icon}"></i>)
+      else
+        @emoji
+      end
+    end
+
     # Check if the category has been used at all.
     def include? tag
       return false unless @terms.nil? or @terms.include? tag
@@ -489,10 +471,10 @@ class Event < RawEvent
 
   # The categories that an event can fall under.
   #
-  # The final item is the default, for when no other category fits.
+  # The first item is the default, for when no other category fits.
   CATEGORIES = [
+    Category.new('hiking', 'hike', icon: 'fa-hiking'), # default
     Category.new('cycling', 'cycle', 'bike', 'biking', icon: 'fa-biking', emoji: '🚴‍'),
-    Category.new('hiking', 'hike', icon: 'fa-hiking') # default
   ].freeze
 
   # Search through the tags in the title, extracting the first category tag,
@@ -510,7 +492,7 @@ class Event < RawEvent
       category = CATEGORIES.find { |category| category.include? lower_tag }
       next !category
     }
-    return tags, category || CATEGORIES.last
+    return tags, category || CATEGORIES.first
   end
 
   # Fetch the dimensions of the event’s header {#image}.
@@ -522,7 +504,62 @@ class Event < RawEvent
   end
 end
 
+class Listing
+  @@template = nil
+
+  def initialize(file, events)
+    @file, @events = file, events
+  end
+
+  attr_reader :events
+
+  def link
+    "/#{@file.sub(/(index)?\.html$/,'')}"
+  end
+
+  def save_index
+    html = template.build_page(self)
+    File.write(@file, html)
+  end
+
+  def categories
+    return @categories if instance_variable_defined? :@categories
+    category_names = events.map(&:category).to_set
+    @categories = Event::CATEGORIES.select { |c| category_names.include?(c.name) }
+  end
+
+  private
+  
+  def template
+    @@template = @@template || Template.new('templates/listing.haml')
+  end
+
+  def self_link?(href)
+    href = href.sub(/^\//,'')
+    [
+      href,
+      "#{href}.html",
+      href.empty? ? "index.html" : "#{href}/index.html"
+    ].include? @file
+  end
+end
+
+# Create listing pages of the events given, using the +listing.haml+
+# template.
+#
+# Different pages are generated, including for the upcoming and past events.
+#
+# @param [Array<Event>] events an array of {Event +Event+s} to include.
+def save_indices(events)
+  listings = [
+    Listing.new('index.html', events.select(&:upcoming?).sort_by(&:date)),
+    Listing.new('past.html', events.select(&:past?).sort_by(&:date).reverse),
+    Listing.new('all.html', events.sort_by(&:date).reverse),
+  ]
+  listings.each(&:save_index)
+end
+
 if __FILE__ == $0
   events = Event.save_events()
-  Event.save_indices(events)
+  save_indices(events)
 end

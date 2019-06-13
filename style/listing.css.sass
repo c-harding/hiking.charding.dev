@@ -1,11 +1,22 @@
-=card
+@import "https://fonts.googleapis.com/css?family=Lato:400,700&display=optional"
+@import "https://fonts.googleapis.com/css?family=Satisfy&display=swap"
+  
+@mixin card($radius: 1em)
   background-color: white
-  border-radius: 1em
+  border-radius: $radius
+  overflow: hidden
   margin: 1em 2em
 
-=reset-link
+@mixin reset-link
   color: inherit
   text-decoration: inherit
+
+@mixin reset-list
+  &, > li
+    margin: 0
+    padding: 0
+    text-indent: 0
+    list-style-type: 0
 
 body
   background-color: #EEE
@@ -24,7 +35,7 @@ main
     flex-wrap: wrap
     justify-content: space-evenly
     align-items: flex-end
-    +card
+    @include card
 
     > *
       padding: 0 1em
@@ -32,17 +43,40 @@ main
 
     .hb-logo
       font-family: Satisfy, cursive, sans-serif
-      +reset-link
+      @include reset-link
 
       &:hover
         text-decoration: underline
+
+nav
+  display: flex
+  flex-direction: row
+  justify-content: space-evenly
+
+  > ul
+    @include card($radius: 0.5em)
+    @include reset-list
+    
+    > li
+      display: inline-block
+
+      > a
+        @include reset-link
+        display: inline-block
+        padding: 0.5em
+
+        &.this
+          background-color: #ccc
+        
+        &:hover
+          background-color: #999
 
 a.card
   overflow: hidden
   display: flex
   flex-direction: row
-  +reset-link
-  +card
+  @include reset-link
+  @include card
 
   .permalink
     position: absolute
