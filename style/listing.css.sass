@@ -45,13 +45,14 @@ main
       font-family: Satisfy, cursive, sans-serif
       @include reset-link
 
-      &:hover
+      .can-hover &:hover
         text-decoration: underline
 
 nav
   display: flex
   flex-direction: row
   justify-content: space-evenly
+  margin: 0 2em
 
   > ul
     @include card($radius: 0.5em)
@@ -68,7 +69,7 @@ nav
         &.this
           background-color: #ccc
         
-        &:hover
+        .can-hover &:hover
           background-color: #999
 
 a.card
