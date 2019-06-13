@@ -69,4 +69,5 @@
         permalink.classList.add('copied');
         permalink.classList.remove('copying');
         setTimeout(() => permalink.classList.remove('copied'), 1000);
+        document.activeElement.blur();
       });
