@@ -397,6 +397,7 @@ organised through
     permalink.classList.add('copying');
     input.select();
     document.execCommand('copy');
+    input.blur();
     permalink.classList.add('copied');
     permalink.classList.remove('copying');
     setTimeout(() => permalink.classList.remove('copied'), 1000);
