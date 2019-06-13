@@ -44,6 +44,37 @@ a.card
   +reset-link
   +card
 
+  .permalink
+    position: absolute
+    top: 0
+    right: 0
+    padding: 0 1em
+    cursor: alias
+    color: #aaa
+    font-size: 0.75em
+    
+    .linkText, input
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace
+      text-align: right
+    
+    input
+      display: none
+      border: none
+      color: inherit
+    
+    .copiedMessage
+      display: none
+    
+    &.copying
+      input
+        display: unset
+      .linkText
+        display: none
+    
+    &.copied
+      .copiedMessage
+        display: unset
+
   > figure
     width: 50%
     flex-grow: 0
@@ -58,6 +89,7 @@ a.card
       height: 100%
   
   aside
+    position: relative
     padding: 0 1em
     flex: 1 1 50%
     ul

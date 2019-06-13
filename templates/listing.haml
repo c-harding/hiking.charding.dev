@@ -22,6 +22,10 @@
           %figure
             %img{src: event.image}
           %aside
+            .permalink{href: event.local_link}
+              %span.copiedMessage copied
+              %span.linkText= event.local_link
+              %input
             %h2= event.title
             %ul
               %li= event.category_icon
@@ -48,3 +52,20 @@
               - else
                 %li.capacity.full #{event.registered}/#{event.capacity} registered, #{event.waiting} waiting
             %p= event.desc
+    :javascript
+      document.body.addEventListener('click', e => {
+        const permalink = e.target.closest('.permalink');
+        if (permalink === null) return;
+        e.preventDefault();
+
+        const input = permalink.querySelector('input');
+        const linkText = permalink.querySelector('.linkText').innerText;
+        input.setAttribute('size', linkText.length);
+        input.value = permalink.closest('a').href;
+        permalink.classList.add('copying');
+        input.select();
+        document.execCommand('copy');
+        permalink.classList.add('copied');
+        permalink.classList.remove('copying');
+        setTimeout(() => permalink.classList.remove('copied'), 1000);
+      });
