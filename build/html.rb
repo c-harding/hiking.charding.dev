@@ -103,7 +103,7 @@ class RawEvent
     end
     begin
       if (base = ENV['URL'])
-        cache = YAML::load(source(URI:join(base,cache_url)))
+        cache = YAML::load(source(URI::join(base,cache_url)))
       else
         cache = YAML::load(IO.read(cache_url))
       end
