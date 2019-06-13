@@ -45,11 +45,36 @@ class RawEvent
   end
 
   FIELDS = [
-    :link, :id, :raw_title, :date, :capacity,
+    :link, :id, :raw_title, :date,
     :image, :image_width, :image_height, :age,
+    :capacity, :registered, :waiting,
   ].freeze
 
   attr_reader(*FIELDS)
+
+  # Has this event happened? Note that this returns false on the day of the
+  # event, but true on the following day, even for multiday events.
+  #
+  # @todo Add support for multiday events, and for determining if the event is
+  #   ongoing.
+  #
+  # @return [Boolean]
+  def past?
+    date.to_date.past?
+  end
+
+  def long_past?
+    (date.to_date + 3).past?
+  end
+
+  # Is this event yet to happen?
+  #
+  # @see #past?
+  #
+  # @return [Boolean]
+  def upcoming?
+    not past?
+  end
 
   protected
 
@@ -91,6 +116,7 @@ class RawEvent
     }.to_h
 
     cache[:version] = CACHE_VERSION
+    cache[:long_past] = long_past?
 
     FileUtils.mkdir_p(@link)
     File.open(cache_url, "w") { |file| file.write(cache.to_yaml) }
@@ -115,13 +141,17 @@ class RawEvent
     FIELDS.each do |attr|
       instance_variable_set("@#{attr}", cache[attr])
     end
+    
     @age = cache[:age] + 1
-    return false if @age > 20 and not @date.to_date.past?
+    
+    fetch_participants unless cache[:long_past]
+
+    return false if @age > 20 and not past?
     return true
   end
 
   def fetch_info_web
-    puts "Fetching from web"
+    puts "#{link}: Fetching from web"
     doc = Nokogiri::HTML(source(url))
     
     @raw_title = doc.at('.event-name').text
@@ -135,10 +165,23 @@ class RawEvent
     @capacity = doc.at('input[name=max_participants]')["value"].to_i
 
     @age = 0
+
+    fetch_participants
   end
 
   def fetch_image_info
     @image_width, @image_height = FastImage.size(image)
+  end
+
+  # Fetch information about the event from the Hiking Buddies Website.
+  #
+  # This sets {#registered} and {#waiting}, so {#available} can be calculated
+  # too.
+  def fetch_participants
+    puts "#{link}: Fetching participants"
+    json = JSON.parse(source(hb "/routes/get_event_details/?event_id=#{@id}"))
+    @registered = JSON.parse(json['participants']).length
+    @waiting = JSON.parse(json['participants_waiting']).length
   end
 end
 
@@ -154,7 +197,6 @@ class Event < RawEvent
     super(link, yaml['id'])
     @desc = yaml['desc']
     process_info
-    fetch_participants
   end
 
   attr_reader :id, :desc, :title, :date, :link
@@ -188,26 +230,6 @@ class Event < RawEvent
   # @return [String] the time of the event, e.g. 09:30
   def time_string
     date.strftime('%H:%M')
-  end
-
-  # Has this event happened? Note that this returns false on the day of the
-  # event, but true on the following day, even for multiday events.
-  #
-  # @todo Add support for multiday events, and for determining if the event is
-  #   ongoing.
-  #
-  # @return [Boolean]
-  def past?
-    date.to_date.past?
-  end
-
-  # Is this event yet to happen?
-  #
-  # @see #past?
-  #
-  # @return [Boolean]
-  def upcoming?
-    not past?
   end
 
   # @return [String] the date of the event, and additionally the year of the
@@ -345,7 +367,7 @@ class Event < RawEvent
   def self.save_events
     events = YAML.load_file('events.yml').map do |link, event|
       event = Event.new(event, link)
-      puts "Saving '#{event.title}' to /#{link}/"
+      puts "#{link}: Saving '#{event.title}' to /#{link}/"
       event.save
       event
     end
@@ -385,16 +407,6 @@ class Event < RawEvent
   # @todo update this
   def process_info
     parse_title_tags(@raw_title)
-  end
-
-  # Fetch information about the event from the Hiking Buddies Website.
-  #
-  # This sets {#registered} and {#waiting}, so {#available} can be calculated
-  # too.
-  def fetch_participants
-    json = JSON.parse(source(hb "/routes/get_event_details/?event_id=#{@id}"))
-    @registered = JSON.parse(json['participants']).length
-    @waiting = JSON.parse(json['participants_waiting']).length
   end
 
   # Convert the raw title into tags, stats and the grade.
