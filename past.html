@@ -23,6 +23,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/Ebner_Joch_KVyhWMQ.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/ebner-joch/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/ebner-joch/</span>
+<input>
+</div>
 <h2>Ebner Joch</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -48,6 +53,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/rendering_terminal1.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/muc-airport-loop/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/muc-airport-loop/</span>
+<input>
+</div>
 <h2>MUC airport loop from Garching/Ismaning by road bike</h2>
 <ul>
 <li><i class="fas fa-biking"></i></li>
@@ -72,6 +82,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/Schatzberg_S.JPG">
 </figure>
 <aside>
+<div class="permalink" href="/alpbach/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/alpbach/</span>
+<input>
+</div>
 <h2>Gratlspitze and Schatzberg</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -98,6 +113,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/oben-tipps.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/tegernsee-schliersee/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/tegernsee-schliersee/</span>
+<input>
+</div>
 <h2>Tegernsee - Schliersee: Baumgartenschneid and Gindelalmschneid ridges</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -123,6 +143,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/lawinenabgang-hirschberg.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/hirschberg/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/hirschberg/</span>
+<input>
+</div>
 <h2>Hirschberg</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -148,6 +173,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/Hochunnutz_und_Vorderunnutz_vom_Achensee.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/unnuetz/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/unnuetz/</span>
+<input>
+</div>
 <h2>The Leading Useless: Vorderunnütz from Achensee</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -173,6 +203,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/Dalla_cresta_panorama_verso_il_lagorai_-_panoramio_z55OFh7.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/corno-bianco/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/corno-bianco/</span>
+<input>
+</div>
 <h2>Weißhorn · Corno Bianco</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -199,6 +234,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/Mangfall_Hochmiesing_Rotwand.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/spitzing/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/spitzing/</span>
+<input>
+</div>
 <h2>Jägerkamp, Aiplspitz, Hochmiesing and Rotwand from Spitzing</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -224,6 +264,11 @@ organised through
 <img src="https://www.hiking-buddies.com/media/user_1122/der-erste-blick-zur-reither-spitze-und-zur-noerdlinger-huette.jpg">
 </figure>
 <aside>
+<div class="permalink" href="/reither-spitze/">
+<span class="copiedMessage">copied</span>
+<span class="linkText">/reither-spitze/</span>
+<input>
+</div>
 <h2>Reither Spitze (from Reith, to Seefeld)</h2>
 <ul>
 <li><i class="fas fa-hiking"></i></li>
@@ -245,5 +290,23 @@ organised through
 </aside>
 </a>
 </main>
+<script>
+  document.body.addEventListener('click', e => {
+    const permalink = e.target.closest('.permalink');
+    if (permalink === null) return;
+    e.preventDefault();
+  
+    const input = permalink.querySelector('input');
+    const linkText = permalink.querySelector('.linkText').innerText;
+    input.setAttribute('size', linkText.length);
+    input.value = permalink.closest('a').href;
+    permalink.classList.add('copying');
+    input.select();
+    document.execCommand('copy');
+    permalink.classList.add('copied');
+    permalink.classList.remove('copying');
+    setTimeout(() => permalink.classList.remove('copied'), 1000);
+  });
+</script>
 </body>
 </html>

@@ -37,6 +37,29 @@ a.card {
   background-color: white;
   border-radius: 1em;
   margin: 1em 2em; }
+  a.card .permalink {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 1em;
+    cursor: alias;
+    color: #aaa;
+    font-size: 0.75em; }
+    a.card .permalink .linkText, a.card .permalink input {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      text-align: right; }
+    a.card .permalink input {
+      display: none;
+      border: none;
+      color: inherit; }
+    a.card .permalink .copiedMessage {
+      display: none; }
+    a.card .permalink.copying input {
+      display: unset; }
+    a.card .permalink.copying .linkText {
+      display: none; }
+    a.card .permalink.copied .copiedMessage {
+      display: unset; }
   a.card > figure {
     width: 50%;
     flex-grow: 0;
@@ -49,6 +72,7 @@ a.card {
       width: 100%;
       height: 100%; }
   a.card aside {
+    position: relative;
     padding: 0 1em;
     flex: 1 1 50%; }
     a.card aside ul {
