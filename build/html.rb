@@ -37,30 +37,128 @@ class Template
   end
 end
 
+class RawEvent
+  def initialize(link, id)
+    @link, @id = link, id
+    fetch_info
+    save_info
+  end
+
+  FIELDS = [
+    :link, :id, :raw_title, :date, :capacity,
+    :image, :image_width, :image_height, :age,
+  ].freeze
+
+  attr_reader(*FIELDS)
+
+  protected
+
+  # Create an absolute URL to the Hiking Buddies website.
+  #
+  # @param [String] url the relative URL to an item on the HB website.
+  #
+  # @return [String] an absolute link to +url+.
+  def hb url
+    URI::join('https://www.hiking-buddies.com/', url).to_s
+  end
+
+  # @return [String] the URL to the event on the HB website
+  def url
+    hb "/routes/events/#{@id}/"
+  end
+
+  # @return [String] The contents of the URL, with the language header set to
+  # avoid a crash on the Hiking Buddies server.
+  def source(url)
+    open(url, 'Accept-Language' => 'en') { |f| f.read }
+  end
+
+  private
+
+  CACHE_VERSION = 1
+
+  def fetch_info
+    fetch_info_cache or fetch_info_web
+  end
+
+  def cache_url
+    "#{@link}/cache.yml"
+  end
+
+  def save_info
+    cache = FIELDS.map { |attr|
+      [attr, instance_variable_get("@#{attr}")]
+    }.to_h
+
+    cache[:version] = CACHE_VERSION
+
+    FileUtils.mkdir_p(@link)
+    File.open(cache_url, "w") { |file| file.write(cache.to_yaml) }
+  end
+
+  def fetch_info_cache
+    no_cache = (ENV['TRAVIS_COMMIT_MESSAGE'] =~ /\[no-cache\]/i)
+    if ENV['REBUILD'] or (ENV['TRAVIS_EVENT_TYPE'] != 'push' and no_cache)
+      return false
+    end
+    begin
+      if (base = ENV['URL'])
+        cache = YAML::load(source(URI:join(base,cache_url)))
+      else
+        cache = YAML::load(IO.read(cache_url))
+      end
+    rescue OpenURI::HTTPError, Errno::ENOENT
+      return false
+    end
+    return false if cache[:id] != @id or cache[:version] != CACHE_VERSION
+    FIELDS.each do |attr|
+      instance_variable_set("@#{attr}", cache[attr])
+    end
+    @age = cache[:age] + 1
+    return false if @age > 20 and not @date.to_date.past?
+    return true
+  end
+
+  def fetch_info_web
+    puts "Fetching from web"
+    doc = Nokogiri::HTML(source(url))
+    
+    @raw_title = doc.at('.event-name').text
+    
+    rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
+    @image = URI::join(url, rel_image).to_s
+    
+    date_string = doc.at('input[name=start]')["value"]
+    @date = DateTime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+
+    @capacity = doc.at('input[name=max_participants]')["value"].to_i
+
+    @age = 0
+  end
+
+  def fetch_image_info
+    @image_width, @image_height = FastImage.size(image)
+  end
+end
+
 # An event, used for creating a page for social media previewing, as well as
 # for showing up in listings.
-class Event
+class Event < RawEvent
   # The template to use when initialising the event redirect pages.
-  @@HIKE_TEMPLATE = Template.new('templates/event.haml').freeze
+  HIKE_TEMPLATE = Template.new('templates/event.haml').freeze
   
   # @param [YAML] yaml The description of the event in the events.yml file.
   # @param [String] link The URI component representing this item.
   def initialize(yaml, link)
-    @link = link
-    @id = yaml['id']
+    super(link, yaml['id'])
     @desc = yaml['desc']
-    fetch_info
+    process_info
     fetch_participants
   end
 
   attr_reader :id, :desc, :title, :date, :link
   attr_reader :capacity, :registered, :waiting, :image
   attr_reader :category, :grade, :distance, :ascent
-
-  # @return [String] the URL to the event on the HB website
-  def url
-    hb "/routes/events/#{@id}/"
-  end
 
   # @return [String] the relative URL to the event’s page on this site
   def local_link
@@ -130,21 +228,17 @@ class Event
     capacity - registered
   end
 
-  # Get the height of the header image for the event. This is lazy, and so the
-  # image dimensions are not looked up until needed.
+  # Get the height of the header image for the event.
   #
   # @return [Integer]
   def image_height
-    fetch_image_info unless instance_variable_defined? :@image_height
     @image_height
   end
 
-  # Get the width of the header image for the event. This is lazy, and so the
-  # image dimensions are not looked up until needed.
+  # Get the width of the header image for the event.
   #
   # @return [Integer]
   def image_width
-    fetch_image_info unless instance_variable_defined? :@image_width
     @image_width
   end
 
@@ -232,7 +326,7 @@ class Event
   #
   # @return [String] the HTML contents of the file.
   def save
-    html = @@HIKE_TEMPLATE.build_page(self)
+    html = HIKE_TEMPLATE.build_page(self)
 
     FileUtils.mkdir_p(link)
     File.write("#{link}/index.html", html)
@@ -242,7 +336,7 @@ class Event
   # Generate event redirect pages with social media metadata.
   #
   # Iterate through the events in the +events.yml+ file, and generate the
-  # redirect page for it according to the {@@HIKE_TEMPLATE} template.
+  # redirect page for it according to the {HIKE_TEMPLATE} template.
   #
   # @return [Array<Event>] The array of {Event +Event+s}, for use in the
   #   indices.
@@ -286,18 +380,10 @@ class Event
   #
   # This sets {#image}, {#date} and {#capacity}, as well as everything that
   # {#parse_title_tags} sets.
-  def fetch_info
-    doc = Nokogiri::HTML(source(url))
-    
-    parse_title_tags(doc.at('.event-name').text)
-    
-    rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
-    @image = URI::join(url, rel_image).to_s
-    
-    date_string = doc.at('input[name=start]')["value"]
-    @date = DateTime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
-
-    @capacity = doc.at('input[name=max_participants]')["value"].to_i
+  #
+  # @todo update this
+  def process_info
+    parse_title_tags(@raw_title)
   end
 
   # Fetch information about the event from the Hiking Buddies Website.
@@ -308,12 +394,6 @@ class Event
     json = JSON.parse(source(hb "/routes/get_event_details/?event_id=#{@id}"))
     @registered = JSON.parse(json['participants']).length
     @waiting = JSON.parse(json['participants_waiting']).length
-  end
-  
-  # @return [String] The contents of the URL, with the language header set to
-  # avoid a crash on the Hiking Buddies server.
-  def source(url)
-    open(url, 'Accept-Language' => 'en') { |f| f.read }
   end
 
   # Convert the raw title into tags, stats and the grade.
@@ -397,13 +477,13 @@ class Event
   # The categories that an event can fall under.
   #
   # The final item is the default, for when no other category fits.
-  @@categories = [
+  CATEGORIES = [
     Category.new('cycling', 'cycle', 'bike', 'biking', icon: 'fa-biking', emoji: '🚴‍'),
     Category.new('hiking', 'hike', icon: 'fa-hiking') # default
   ].freeze
 
   # Search through the tags in the title, extracting the first category tag,
-  # or defaulting to the last category in {@@categories}.
+  # or defaulting to the last category in {CATEGORIES}.
   #
   # @param [Array<String>] tags the tags parsed from the title, to scan
   #
@@ -414,19 +494,10 @@ class Event
     tags = tags.select { |tag|
       next true if category
       lower_tag = tag.downcase
-      category = @@categories.find { |category| category.include? lower_tag }
+      category = CATEGORIES.find { |category| category.include? lower_tag }
       next !category
     }
-    return tags, category || @@categories.last
-  end
-
-  # Create an absolute URL to the Hiking Buddies website.
-  #
-  # @param [String] url the relative URL to an item on the HB website.
-  #
-  # @return [String] an absolute link to +url+.
-  def hb url
-    URI::join('https://www.hiking-buddies.com/', url).to_s
+    return tags, category || CATEGORIES.last
   end
 
   # Fetch the dimensions of the event’s header {#image}.
