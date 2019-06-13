@@ -1,4 +1,6 @@
 @charset "UTF-8";
+@import "https://fonts.googleapis.com/css?family=Lato:400,700&display=optional";
+@import "https://fonts.googleapis.com/css?family=Satisfy&display=swap";
 body {
   background-color: #EEE;
   font-family: Lato, sans-serif; }
@@ -17,6 +19,7 @@ main {
     align-items: flex-end;
     background-color: white;
     border-radius: 1em;
+    overflow: hidden;
     margin: 1em 2em; }
     main > heading > * {
       padding: 0 1em;
@@ -28,6 +31,32 @@ main {
       main > heading .hb-logo:hover {
         text-decoration: underline; }
 
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly; }
+  nav > ul {
+    background-color: white;
+    border-radius: 0.5em;
+    overflow: hidden;
+    margin: 1em 2em; }
+    nav > ul, nav > ul > li {
+      margin: 0;
+      padding: 0;
+      text-indent: 0;
+      list-style-type: 0; }
+    nav > ul > li {
+      display: inline-block; }
+      nav > ul > li > a {
+        color: inherit;
+        text-decoration: inherit;
+        display: inline-block;
+        padding: 0.5em; }
+        nav > ul > li > a.this {
+          background-color: #ccc; }
+        nav > ul > li > a:hover {
+          background-color: #999; }
+
 a.card {
   overflow: hidden;
   display: flex;
@@ -36,6 +65,7 @@ a.card {
   text-decoration: inherit;
   background-color: white;
   border-radius: 1em;
+  overflow: hidden;
   margin: 1em 2em; }
   a.card .permalink {
     position: absolute;
