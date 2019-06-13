@@ -6,7 +6,7 @@
 <title>Hiking with Charlie</title>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 <link href="https://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" type="text/css">
-<link href="/style/listing.css" rel="stylesheet" type="text/css">
+<link contenteditable href="/style/listing.css" rel="stylesheet" type="text/css">
 <script src="https://kit.fontawesome.com/772a32a5d5.js"></script>
 </head>
 <body>
@@ -107,7 +107,7 @@ organised through
 </ul>
 <ul data-id="793">
 <li>Sun 16 Jun, 06:55</li>
-<li class="capacity full">10/10 registered, 10 waiting</li>
+<li class="capacity full">10/10 registered, 9 waiting</li>
 </ul>
 <p>Who fancies a trip to the land of the dragon: Drachenkopf and Drachensee? This is a tough hike, with 1500 m ascent, some Grade I scrambling, and 22 km. It should be very rewarding, with great views over Zugspitze and Drachensee, where we will be able to cool off on the descent.</p>
 </aside>
@@ -396,6 +396,11 @@ organised through
     input.value = permalink.closest('a').href;
     permalink.classList.add('copying');
     input.select();
+    const range = document.createRange();
+    range.selectNodeContents(input);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
     document.execCommand('copy');
     input.blur();
     permalink.classList.add('copied');
