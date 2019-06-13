@@ -125,7 +125,7 @@ class RawEvent
   def fetch_info_cache
     no_cache = ENV['TRAVIS_COMMIT_MESSAGE'] =~ /\[no-cache\]/i
     no_cache ||= ENV['TRAVIS_COMMIT_MESSAGE'] =~ /\[no-cache: #{Regexp.escape(@link)}\]/i
-    if ENV['REBUILD'] or (ENV['TRAVIS_EVENT_TYPE'] != 'push' and no_cache)
+    if ENV['REBUILD'] or (ENV['TRAVIS_EVENT_TYPE'] == 'push' and no_cache)
       return false
     end
     begin
