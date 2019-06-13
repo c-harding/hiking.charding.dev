@@ -6,5 +6,6 @@ vendor/
 Gemfile
 build/
 *.yml
+!cache.yml
 *.haml
 *.sass
