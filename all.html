@@ -6,7 +6,7 @@
 <title>Hiking with Charlie</title>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 <link href="https://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet" type="text/css">
-<link contenteditable href="/style/listing.css" rel="stylesheet" type="text/css">
+<link href="/style/listing.css" rel="stylesheet" type="text/css">
 <script src="https://kit.fontawesome.com/772a32a5d5.js"></script>
 </head>
 <body>
@@ -26,7 +26,7 @@ organised through
 <div class="permalink" href="/salzburg-inntal/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/salzburg-inntal/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Salzburg to Inntal</h2>
 <ul>
@@ -58,7 +58,7 @@ organised through
 <div class="permalink" href="/bike-werdenfels/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/bike-werdenfels/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Oberau to Kochel, via Plansee and Walchensee</h2>
 <ul>
@@ -90,7 +90,7 @@ organised through
 <div class="permalink" href="/drachenkopf/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/drachenkopf/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Drachenkopf</h2>
 <ul>
@@ -120,7 +120,7 @@ organised through
 <div class="permalink" href="/ebner-joch/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/ebner-joch/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Ebner Joch</h2>
 <ul>
@@ -150,7 +150,7 @@ organised through
 <div class="permalink" href="/muc-airport-loop/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/muc-airport-loop/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>MUC airport loop from Garching/Ismaning by road bike</h2>
 <ul>
@@ -179,7 +179,7 @@ organised through
 <div class="permalink" href="/alpbach/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/alpbach/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Gratlspitze and Schatzberg</h2>
 <ul>
@@ -210,7 +210,7 @@ organised through
 <div class="permalink" href="/tegernsee-schliersee/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/tegernsee-schliersee/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Tegernsee - Schliersee: Baumgartenschneid and Gindelalmschneid ridges</h2>
 <ul>
@@ -240,7 +240,7 @@ organised through
 <div class="permalink" href="/hirschberg/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/hirschberg/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Hirschberg</h2>
 <ul>
@@ -270,7 +270,7 @@ organised through
 <div class="permalink" href="/unnuetz/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/unnuetz/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>The Leading Useless: Vorderunnütz from Achensee</h2>
 <ul>
@@ -300,7 +300,7 @@ organised through
 <div class="permalink" href="/corno-bianco/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/corno-bianco/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Weißhorn · Corno Bianco</h2>
 <ul>
@@ -331,7 +331,7 @@ organised through
 <div class="permalink" href="/spitzing/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/spitzing/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Jägerkamp, Aiplspitz, Hochmiesing and Rotwand from Spitzing</h2>
 <ul>
@@ -361,7 +361,7 @@ organised through
 <div class="permalink" href="/reither-spitze/">
 <span class="copiedMessage">copied</span>
 <span class="linkText">/reither-spitze/</span>
-<input>
+<input contenteditable>
 </div>
 <h2>Reither Spitze (from Reith, to Seefeld)</h2>
 <ul>
@@ -389,23 +389,29 @@ organised through
     const permalink = e.target.closest('.permalink');
     if (permalink === null) return;
     e.preventDefault();
+    permalink.classList.remove('copied');
+    clearTimeout(permalink.dataset.timeout);
   
     const input = permalink.querySelector('input');
     const linkText = permalink.querySelector('.linkText').innerText;
     input.setAttribute('size', linkText.length);
     input.value = permalink.closest('a').href;
     permalink.classList.add('copying');
-    input.select();
+    
     const range = document.createRange();
     range.selectNodeContents(input);
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
+    input.setSelectionRange(0, 999999);
+    
     document.execCommand('copy');
     input.blur();
     permalink.classList.add('copied');
     permalink.classList.remove('copying');
-    setTimeout(() => permalink.classList.remove('copied'), 1000);
+    permalink.dataset.timeout = setTimeout(() => {
+      permalink.classList.remove('copied');
+    }, 1000);
     document.activeElement.blur();
   });
 </script>
