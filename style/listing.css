@@ -42,7 +42,7 @@ a.card {
     top: 0;
     right: 0;
     padding: 2em 3em;
-    margin: 2em;
+    margin: -2em;
     cursor: alias;
     color: #aaa;
     font-size: 0.75em; }
