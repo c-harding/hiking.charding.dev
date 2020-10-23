@@ -474,7 +474,7 @@ class Event < RawEvent
   # The first item is the default, for when no other category fits.
   CATEGORIES = [
     Category.new('hiking', 'hike', icon: 'fa-hiking'), # default
-    Category.new('cycling', 'cycle', 'bike', 'biking', icon: 'fa-biking', emoji: '🚴‍'),
+    Category.new('cycling', 'cycle', 'road cycling', 'road biking', 'bike', 'biking', icon: 'fa-biking', emoji: '🚴‍'),
   ].freeze
 
   # Search through the tags in the title, extracting the first category tag,
