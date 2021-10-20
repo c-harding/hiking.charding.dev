@@ -134,7 +134,7 @@ class RawEvent
       else
         cache = YAML::load(IO.read(cache_url))
       end
-    rescue OpenURI::HTTPError, Errno::ENOENT
+    rescue OpenURI::HTTPError, OpenSSL::SSL::SSLError, Errno::ENOENT
       return false
     end
     return false if cache[:id] != @id or cache[:version] != CACHE_VERSION
