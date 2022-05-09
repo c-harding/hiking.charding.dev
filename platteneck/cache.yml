@@ -3,7 +3,7 @@
 :id: 2754
 :raw_title: T3 - Reitstein and Platteneck from Wildbad Kreuth [18.9 km, 1056 m asc.]
 :date: !ruby/object:DateTime 2020-10-25 09:15:00.000000000 Z
-:image: 
+:image: https://www.hiking-buddies.com/media/user_1122/image.jpg
 :image_width: 
 :image_height: 
 :age: 0
@@ -12,5 +12,5 @@
 :capacity: 8
 :registered: 2
 :waiting: 5
-:version: 2
+:version: 3
 :long_past: true

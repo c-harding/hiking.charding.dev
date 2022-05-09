@@ -3,7 +3,7 @@
 :id: 793
 :raw_title: T6 - Drachenkopf [22.2 Km, 1500 m gain]
 :date: !ruby/object:DateTime 2019-07-14 06:55:00.000000000 Z
-:image: 
+:image: https://www.hiking-buddies.com/media/user_1122/Drachensee_Bernd_Edelmann.jpg
 :image_width: 
 :image_height: 
 :age: 0
@@ -12,5 +12,5 @@
 :capacity: 10
 :registered: 5
 :waiting: 0
-:version: 2
+:version: 3
 :long_past: true
