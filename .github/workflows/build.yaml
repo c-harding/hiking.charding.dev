@@ -25,6 +25,3 @@ jobs:
         with:
           branch: gh-pages
           folder: .
-      - name: Update Social Previews
-        run: |
-          build/rebuild_facebook_previews.rb
