@@ -4,12 +4,14 @@
 :raw_title: "[Cycling] Oberau to Kochel, via Plansee and Walchensee [121 – 156 km,
   1530 – 2580 m asc.]"
 :date: !ruby/object:DateTime 2019-06-30 07:15:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/Am_Plansee_entlang_1400x640_jPTN5nW.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 
+:ascent: 
 :capacity: 5
 :registered: 3
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

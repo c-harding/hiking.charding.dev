@@ -4,12 +4,14 @@
 :raw_title: "[CYCLING] MUC airport loop from Garching/Ismaning by road bike [65.0
   Km, 273 m gain]"
 :date: !ruby/object:DateTime 2019-05-24 14:00:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/rendering_terminal1.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 
+:ascent: 
 :capacity: 5
 :registered: 1
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

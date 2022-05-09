@@ -3,12 +3,14 @@
 :id: 671
 :raw_title: T2 - [AUSTRIA] Gratlspitze and Schatzberg [18.9 Km, 1466 m gain]
 :date: !ruby/object:DateTime 2019-05-05 10:00:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/Schatzberg_S.JPG
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 18.9 km
+:ascent: 1466 m
 :capacity: 5
 :registered: 2
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

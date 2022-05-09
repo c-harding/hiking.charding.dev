@@ -3,12 +3,14 @@
 :id: 765
 :raw_title: T2 - Ebner Joch [7.6 Km, 970 m gain]
 :date: !ruby/object:DateTime 2019-06-10 09:00:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/Ebner_Joch_KVyhWMQ.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 9.1 km
+:ascent: 975 m
 :capacity: 9
 :registered: 7
 :waiting: 5
-:version: 1
+:version: 2
 :long_past: true

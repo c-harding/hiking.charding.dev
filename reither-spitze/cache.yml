@@ -3,12 +3,14 @@
 :id: 276
 :raw_title: T3 - Reither Spitze (from Reith, to Seefeld) [11.8 Km, 1255 m gain]
 :date: !ruby/object:DateTime 2018-10-19 07:15:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/der-erste-blick-zur-reither-spitze-und-zur-noerdlinger-huette.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 11.8 km
+:ascent: 1255 m
 :capacity: 10
 :registered: 3
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

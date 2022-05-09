@@ -4,12 +4,14 @@
 :raw_title: 'T6 - [Speed hiking] Estergebirge: Walchensee – Garmisch (Hohe Kisten,
   Krottenkopf, Hoher Fricken, Wank)'
 :date: !ruby/object:DateTime 2021-09-18 05:20:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/IMG_1172_957px.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 37.1 km
+:ascent: 2918 m
 :capacity: 4
 :registered: 3
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

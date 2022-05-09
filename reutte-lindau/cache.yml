@@ -2,13 +2,15 @@
 :link: reutte-lindau
 :id: 3424
 :raw_title: "[Cycling] Reutte to Lindau [137 km, 1300 m asc.]"
-:date: !ruby/object:DateTime 2021-06-19 06:20:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/Luftaufnahme_Insel-Nordost_Hari-Pulko-1.jpg
+:date: !ruby/object:DateTime 2021-06-19 05:20:00.000000000 Z
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 
+:ascent: 
 :capacity: 4
 :registered: 2
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

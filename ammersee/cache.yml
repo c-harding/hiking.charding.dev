@@ -3,12 +3,14 @@
 :id: 997
 :raw_title: "[Cycling] Ammersee lap from Schäftlarn [71.0 km, 658 m asc.]"
 :date: !ruby/object:DateTime 2019-08-06 18:00:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/wohnen-im-alter-augustinum-ammersee_0iLnn1W.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 
+:ascent: 
 :capacity: 10
 :registered: 2
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true

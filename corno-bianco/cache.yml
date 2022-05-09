@@ -3,12 +3,14 @@
 :id: 428
 :raw_title: T4 - [ITALY] Weißhorn · Corno Bianco [13.9 Km, 866 m gain]
 :date: !ruby/object:DateTime 2019-01-24 10:30:00.000000000 Z
-:image: https://www.hiking-buddies.com/media/user_1122/Dalla_cresta_panorama_verso_il_lagorai_-_panoramio_z55OFh7.jpg
+:image: 
 :image_width: 
 :image_height: 
-:age: 70
+:age: 0
+:distance: 13.9 km
+:ascent: 866 m
 :capacity: 5
 :registered: 4
 :waiting: 0
-:version: 1
+:version: 2
 :long_past: true
