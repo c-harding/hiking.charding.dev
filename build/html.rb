@@ -101,9 +101,9 @@ class RawEvent
 
   private
 
-  HIKING_BUDDIES_DEFAULT_IMAGE = "https://www.hiking-buddies.com/static/images/event-hiking-2540189_1920.66d8402334e3.jpg"
+  HIKING_BUDDIES_DEFAULT_IMAGE = "/static/images/event-hiking-2540189_1920.66d8402334e3.jpg"
 
-  CACHE_VERSION = 2
+  CACHE_VERSION = 3
 
   def fetch_info
     fetch_info_cache or fetch_info_web
@@ -135,7 +135,7 @@ class RawEvent
     rescue OpenURI::HTTPError, OpenSSL::SSL::SSLError, Errno::ENOENT
       return false
     end
-    @cached_image = cache[:image]
+
     return false if cache[:id] != @id or cache[:version] != CACHE_VERSION
     FIELDS.each do |attr|
       instance_variable_set("@#{attr}", cache[attr])
@@ -156,10 +156,10 @@ class RawEvent
     @raw_title = doc.at('.event-name').text
 
     rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
-    abs_image = URI::join(url, rel_image).to_s
-
-    # Do not apply the image change if the image is a placeholder
-    @image = abs_image if abs_image != HIKING_BUDDIES_DEFAULT_IMAGE
+    if rel_image == HIKING_BUDDIES_DEFAULT_IMAGE
+      rel_image = doc.at('//script[text()[contains(.,"const images =")]]').text.match(/const images = \[[^}]+?url:\s*"(.+)"/)&.[](1)
+    end
+    @image = URI::join(url, rel_image).to_s if rel_image
 
     date_string = doc.at('input[name=start]')["value"]
     @date = DateTime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
