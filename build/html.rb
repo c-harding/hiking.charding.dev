@@ -100,6 +100,8 @@ class RawEvent
 
   private
 
+  HIKING_BUDDIES_DEFAULT_IMAGE = "https://www.hiking-buddies.com/static/images/event-hiking-2540189_1920.66d8402334e3.jpg"
+
   CACHE_VERSION = 1
 
   def fetch_info
@@ -137,13 +139,14 @@ class RawEvent
     rescue OpenURI::HTTPError, OpenSSL::SSL::SSLError, Errno::ENOENT
       return false
     end
+    @cached_image = cache[:image]
     return false if cache[:id] != @id or cache[:version] != CACHE_VERSION
     FIELDS.each do |attr|
       instance_variable_set("@#{attr}", cache[attr])
     end
-    
+
     @age = cache[:age] + 1
-    
+
     fetch_participants unless cache[:long_past]
 
     return false if @age > 20 and not past?
@@ -153,12 +156,15 @@ class RawEvent
   def fetch_info_web
     puts "#{link}: Fetching from web"
     doc = Nokogiri::HTML(source(url))
-    
+
     @raw_title = doc.at('.event-name').text
-    
+
     rel_image = doc.at('.cover_container')['style'].match(/url\((.+)\)/)[1]
-    @image = URI::join(url, rel_image).to_s
-    
+    abs_image = URI::join(url, rel_image).to_s
+
+    # Do not apply the image change if the image is a placeholder
+    @image = abs_image if abs_image != HIKING_BUDDIES_DEFAULT_IMAGE
+
     date_string = doc.at('input[name=start]')["value"]
     @date = DateTime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
 
@@ -190,7 +196,7 @@ end
 class Event < RawEvent
   # The template to use when initialising the event redirect pages.
   HIKE_TEMPLATE = Template.new('templates/event.haml').freeze
-  
+
   # @param [YAML] yaml The description of the event in the events.yml file.
   # @param [String] link The URI component representing this item.
   def initialize(yaml, link)
@@ -271,7 +277,7 @@ class Event < RawEvent
     # @overload initialize(short, long)
     #   @param [<String>] short The {#short} form of the tag.
     #   @param [<String>] long The {#long} form of the tag.
-    # 
+    #
     # @overload initialize(raw_tag)
     #   Parse the tag from the title to generate the short and long forms.
     #
@@ -403,7 +409,7 @@ class Event < RawEvent
       parse_stats(match[2])
     end
     @title = working_title
-    
+
     @tags, @category = parse_category(tags)
   end
 
@@ -437,7 +443,7 @@ class Event < RawEvent
       @terms = Set[*names].freeze
       @used = false
     end
-  
+
     # @return [String] the name of the category
     attr_reader :name
 
@@ -529,7 +535,7 @@ class Listing
   end
 
   private
-  
+
   def template
     @@template = @@template || Template.new('templates/listing.haml')
   end
