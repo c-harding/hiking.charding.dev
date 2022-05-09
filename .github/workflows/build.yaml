@@ -16,6 +16,8 @@ jobs:
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
       - name: Build
+        env:
+          URL: https://hiking.charding.dev/
         run: |
           bundle exec build/deploy.rb
       - name: Deploy
