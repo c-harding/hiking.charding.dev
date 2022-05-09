@@ -1,3 +1,19 @@
+welsh-3000s:
+  id: 4872
+  desc: >-
+    A classic British mountain challenge, involving summitting every 3000 ft (915 m) peak in Wales. The cutoff is 24 hours, but aiming for considerably less than that.
+wendelstein:
+  id: 4888
+  desc: >-
+    We’ve got some great weather, so let’s head up to one of the best viewpoints in the Voralpen. There’s a nice hut on top for lunch too! The route is only a suggestion, and we could well include Wildalpjoch too, and finish in either Bayrischzell or Flintsbach/Brannenburg.
+kreuth-snowshoe:
+  id: 4812
+  desc: >-
+    Let’s play in the snow before it melts away! This is a snowshoe hike to the south of Tegernsee. We’ll decide on the exact route on the train/depending on snow conditions.
+gaistal:
+  id: 4351
+  desc: >-
+    If you’re hoping for a snowy valley walk, there are few better destinations than the Gaistal, surrounded by the Zugspitz massif to the north, and Mieming to the south. This is a fairly gentle but long hike, so we will be keeping up a decent pace to keep warm.
 scheffauer:
   id: 4016
   desc: >-
@@ -41,7 +57,7 @@ ammersee:
 hexenkopf:
   id: 983
   desc: >-
-    This hike starts less than three hours from Munich, but climbs up to summits of 3004 m (Furgler) and 3035 m (Hexenkopf), higher than anything in Germany! While Furgler is one of the most popular mountains in Austria, Hexenkopf will be much quieter. 
+    This hike starts less than three hours from Munich, but climbs up to summits of 3004 m (Furgler) and 3035 m (Hexenkopf), higher than anything in Germany! While Furgler is one of the most popular mountains in Austria, Hexenkopf will be much quieter.
 amperau:
   id: 972
   desc: >-
@@ -49,7 +65,7 @@ amperau:
 salzburg-inntal:
   id: 801
   desc: >-
-    Salzburg is the furthest east you can reach within the Alps on a Bayern Ticket. From there, we will head west, climbing mountain passes and getting fantastic views of lakes and far-off mountains. 
+    Salzburg is the furthest east you can reach within the Alps on a Bayern Ticket. From there, we will head west, climbing mountain passes and getting fantastic views of lakes and far-off mountains.
 bike-werdenfels:
   id: 802
   desc: >-

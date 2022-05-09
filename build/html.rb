@@ -47,6 +47,7 @@ class RawEvent
   FIELDS = [
     :link, :id, :raw_title, :date,
     :image, :image_width, :image_height, :age,
+    :distance, :ascent,
     :capacity, :registered, :waiting,
   ].freeze
 
@@ -95,14 +96,14 @@ class RawEvent
   # @return [String] The contents of the URL, with the language header set to
   # avoid a crash on the Hiking Buddies server.
   def source(url)
-    URI.open(url, 'Accept-Language' => 'en') { |f| f.read }
+    URI.open(url, 'Accept-Language' => 'en', 'X-Requested-With' => 'XMLHttpRequest') { |f| f.read }
   end
 
   private
 
   HIKING_BUDDIES_DEFAULT_IMAGE = "https://www.hiking-buddies.com/static/images/event-hiking-2540189_1920.66d8402334e3.jpg"
 
-  CACHE_VERSION = 1
+  CACHE_VERSION = 2
 
   def fetch_info
     fetch_info_cache or fetch_info_web
@@ -168,6 +169,8 @@ class RawEvent
     @age = 0
 
     fetch_participants
+
+    fetch_stats if doc.at('.event-details')
   end
 
   def fetch_image_info
@@ -183,6 +186,13 @@ class RawEvent
     json = JSON.parse(source(hb "/routes/get_event_details/?event_id=#{@id}"))
     @registered = JSON.parse(json['participants']).length
     @waiting = JSON.parse(json['participants_waiting']).length
+  end
+
+  def fetch_stats
+    puts "#{link}: Fetching stats"
+    json = JSON.parse(source(hb "/routes/events/#{@id}/ajax/calculate_coordinates_information_from_db/"))
+    @distance = "#{json["total_distance"].round(1)} km"
+    @ascent = "#{json["gain"].round(0)} m"
   end
 end
 
@@ -214,7 +224,7 @@ class Event < RawEvent
   def page_title
     "#{date_string}:"\
     "#{[*category_emoji,*short_tags].map { |x| " #{x}" }.join} #{title}"\
-    "#{(distance || ascent) && " [#{[distance, "#{ascent} asc."].join(', ')}]"} "\
+    "#{(distance || ascent) && " [#{[distance, ascent && "#{ascent} asc."].compact.join(', ')}]"} "\
       "- Hiking Buddies Munich"
   end
 
@@ -418,9 +428,9 @@ class Event < RawEvent
   def parse_stats(stats)
     stats.split(/,\s*/).each do |stat|
       if (match = stat.match /^(.+[^a-z] km)$/i)
-        @distance = match[1].strip.downcase
+        @distance ||= match[1].strip.downcase
       elsif (match = stat.match /^((.+[^a-z])m)\s+(asc(ent|\.)?|gain)$/i)
-        @ascent = match[1].strip.downcase
+        @ascent ||= match[1].strip.downcase
       else
         STDERR.puts "Unrecognised stat: <#{stat}> [#{stats}]"
       end
