@@ -4,11 +4,11 @@
 :raw_title: T5 - Scheffauer crossing from Kufstein over the Widauersteig (A/B)
 :date: !ruby/object:DateTime 2021-09-26 06:35:00.000000000 Z
 :image: https://www.hiking-buddies.com/media/user_1122/Scheffauer.jpg
-:image_width:
-:image_height:
-:age: 67
+:image_width: 
+:image_height: 
+:age: 68
 :capacity: 8
 :registered: 6
 :waiting: 0
 :version: 1
-:long_past: false
+:long_past: true
