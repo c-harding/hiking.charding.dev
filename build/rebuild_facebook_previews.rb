@@ -6,6 +6,7 @@ require 'net/https'
 cname = File.read('CNAME').strip
 graph = URI.parse("https://graph.facebook.com/")
 
+failures = 0
 Dir['**/*.html'].each do |file|
   path = "https://#{cname}/#{file.sub(/(index)?\.html$/,'')}"
 
@@ -20,5 +21,7 @@ Dir['**/*.html'].each do |file|
   else
     puts "Cannot reset Facebook cache for #{path}"
     puts res.body
+    failures += 1
   end
 end
+exit(failures)
