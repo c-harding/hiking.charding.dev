@@ -1,0 +1,31 @@
+name: Build and Deploy
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Build
+        run: |
+          bundle exec build/deploy.rb
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: .
+  update-social-previews:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          bundle exec build/rebuild_facebook_previews.rb

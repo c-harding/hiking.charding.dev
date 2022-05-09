@@ -95,7 +95,7 @@ class RawEvent
   # @return [String] The contents of the URL, with the language header set to
   # avoid a crash on the Hiking Buddies server.
   def source(url)
-    open(url, 'Accept-Language' => 'en') { |f| f.read }
+    URI.open(url, 'Accept-Language' => 'en') { |f| f.read }
   end
 
   private

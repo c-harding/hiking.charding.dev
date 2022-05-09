@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
+require 'sassc'
+
 processed = []
 
 def parse_sass(input, output)
-  result = system('sass', input, output)
-  raise result unless $?.to_i == 0
-  raise "When compiled the module should output some CSS" unless File.exists?(output)
+  sass = File.read(input)
+  css = SassC::Engine.new(sass, style: :compressed, syntax: :sass).render
+
+  File.write(output, css)
   puts "Built CSS to #{output}"
 end
 
